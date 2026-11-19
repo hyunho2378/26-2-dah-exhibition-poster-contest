@@ -54,7 +54,7 @@ p, dd, li { text-wrap: pretty; }
 /* 홈에서 하늘로 가는 여정: 스크롤 길이만큼 화면이 고정되고, 그 안에서 홈이 지나가며 하늘로 빨려 들어간다 */
 .journey { --travel: 130svh; position: relative; height: calc(100svh + var(--travel)); }
 .stage {
-  --home-o: 1; --home-s: 1; --sky-o: 0; --ui-o: 0;
+  --home-o: 1; --home-s: 1; --sky-o: 0; --ui-o: 0; --cos-o: 1; --px: 0; --py: 0;
   position: sticky; top: 0; height: 100svh; overflow: hidden;
   background: var(--c-night);
 }
@@ -68,16 +68,49 @@ p, dd, li { text-wrap: pretty; }
 
 /* 홈 */
 .home {
-  position: absolute; inset: 0; z-index: 2; overflow: hidden;
+  position: absolute; inset: 0; z-index: 4; overflow: hidden;
   opacity: var(--home-o); transform: scale(var(--home-s)); transform-origin: 50% 50%;
   will-change: transform, opacity;
 }
-.home-bg {
-  position: absolute; inset: 0;
-  background-color: var(--c-night);
-  background-size: cover;
-  background-position: 100% 100%;
+.home-photo {
+  position: absolute; inset: 0; z-index: 2; overflow: hidden; background: var(--c-night);
+  opacity: var(--home-o); transform: scale(var(--home-s)); transform-origin: 50% 50%;
+  will-change: transform, opacity;
 }
+/* 커서를 따라 사진이 깊이만큼 어긋난다 */
+.home-photo-img {
+  position: absolute; inset: -3%;
+  background-size: cover; background-position: 100% 100%;
+  transform: translate3d(calc(var(--px, 0) * -16px), calc(var(--py, 0) * -10px), 0);
+  animation: fade-in 2s ease both;
+}
+.cosmos { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: var(--cos-o, 1); }
+.cosmos canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage.is-away .home-photo { visibility: hidden; }
+.stage.is-arrived .cosmos { visibility: hidden; }
+
+/* 별똥별 */
+.meteors { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.meteor {
+  position: absolute; left: calc(var(--len) * -1); top: 0; width: var(--len); height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--c-meteorTail), var(--c-meteorHead));
+  transform-origin: 100% 50%; opacity: 0;
+  animation: meteor var(--t) cubic-bezier(0.3, 0.1, 0.5, 1) forwards;
+}
+@keyframes meteor {
+  0% { opacity: 0; transform: translate3d(var(--x), var(--y), 0) rotate(var(--a)); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy)), 0) rotate(var(--a)); }
+}
+
+/* 첫 화면 등장: 글자와 정보가 차례로 떠오른다 */
+.rise { animation: rise 1s var(--m-ease) both; animation-delay: calc(0.3s + var(--i, 0) * 0.11s); }
+@keyframes rise {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
 .home-main {
   container-type: inline-size;
   position: relative;
@@ -154,24 +187,6 @@ p, dd, li { text-wrap: pretty; }
 .home-enter:hover { opacity: 0.78; }
 .home-enter:active { opacity: 0.6; }
 
-/* 푸터: 왼쪽에 소속과 주소와 문의, 오른쪽에 전공 사이트 링크. 모든 폭에서 같은 짝이다 */
-.footer {
-  position: relative;
-  background: var(--c-night);
-  padding: var(--s-7) var(--l-gutter) var(--s-8);
-  max-width: var(--l-maxWidth); width: 100%; margin: 0 auto;
-  display: grid; gap: var(--s-5);
-  font-size: var(--t-meta-size); line-height: 1.7; letter-spacing: 0.01em;
-  color: var(--c-textMute);
-  scroll-snap-align: end;
-}
-.footer-link { justify-self: start; text-align: right; color: var(--c-white); opacity: 0.78; transition: opacity var(--m-fast) var(--m-ease); }
-.footer-link:hover { opacity: 1; }
-@media (min-width: 768px) {
-  .footer { grid-template-columns: 1fr auto; align-items: end; }
-  .footer-link { justify-self: end; }
-}
-
 /* 하늘 구간 */
 .sky {
   --band: calc(var(--l-headerHeight) + env(safe-area-inset-top));
@@ -193,10 +208,19 @@ p, dd, li { text-wrap: pretty; }
 /* 번호 없는 별은 어둡게 눌러 두고, 번호 붙은 별만 빛나게 한다 */
 .sky-dim { position: absolute; inset: 0; pointer-events: none; background: var(--c-dim); opacity: var(--dim-o, var(--sky-dim-opacity)); }
 /* 엔진의 회청색 하늘을 포스터의 남보라 색감으로 맞춘다 */
+.sky { --light-r: 180px; }
+/* 커서 둘레만 어둠이 걷힌다 */
+.sky.has-light .sky-dim {
+  -webkit-mask-image: radial-gradient(circle var(--light-r) at var(--mx, -999px) var(--my, -999px), var(--c-maskLight), var(--c-maskFull));
+  mask-image: radial-gradient(circle var(--light-r) at var(--mx, -999px) var(--my, -999px), var(--c-maskLight), var(--c-maskFull));
+}
 .sky-tint { position: absolute; inset: 0; pointer-events: none; background: var(--c-skyTint); mix-blend-mode: color; opacity: var(--sky-tint-opacity); }
 .sky-lines, .sky-markers { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: var(--ui-o); }
-.sky-lines line { stroke: var(--c-line); stroke-width: 1; }
+.sky-lines line { stroke: var(--c-line); stroke-width: 1; opacity: 0; transition: opacity 0.6s var(--m-ease); }
 .sky-lines line.is-on { stroke: var(--c-violetBright); }
+.sky-lines line.is-hot { stroke: var(--c-white); stroke-width: 1.6; }
+/* 하늘에 도착하면 별이 1번부터 차례로 켜지고 선이 이어진다 */
+.stage.is-arrived .sky-lines line { opacity: 1; transition-delay: calc(var(--i, 0) * 110ms + 350ms); }
 
 .star {
   position: absolute; left: 0; top: 0;
@@ -204,7 +228,11 @@ p, dd, li { text-wrap: pretty; }
   pointer-events: auto; visibility: hidden; touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   border-radius: var(--r-base);
+  opacity: 0; transition: opacity 0.7s var(--m-ease);
 }
+.stage.is-arrived .star { opacity: 1; transition-delay: calc(var(--i, 0) * 110ms); }
+.star-ring { position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px; fill: none; stroke: var(--c-white); stroke-width: 1.2; pointer-events: none; animation: ring 0.9s var(--m-ease) forwards; }
+@keyframes ring { from { opacity: 0.9; transform: scale(0.5); } to { opacity: 0; transform: scale(4.2); } }
 .star-core {
   position: absolute; left: 50%; top: 50%; width: var(--core); height: var(--core);
   margin: calc(var(--core) / -2) 0 0 calc(var(--core) / -2); border-radius: 50%;
@@ -389,7 +417,8 @@ p, dd, li { text-wrap: pretty; }
 /* 사용자 설정 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
-  .star-core { animation: none !important; }
+  .star-core, .rise, .home-photo-img { animation: none !important; }
+  .meteors, .star-ring { display: none; }
   html { scroll-snap-type: none; }
 }
 @media (prefers-reduced-transparency: reduce) {

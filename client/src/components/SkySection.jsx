@@ -5,6 +5,7 @@ import { site } from '../data/site.js'
 import { motion as motionTokens, breakpoints } from '../tokens.js'
 import { asset } from '../asset.js'
 import { goHome } from '../journey.js'
+import { runMeteors } from '../fx/meteor.js'
 import { getCanvas, loadEngine, projectObj, fitView } from '../engine/sky.js'
 import DetailPanel from './DetailPanel.jsx'
 import WorksIndex from './WorksIndex.jsx'
@@ -20,9 +21,13 @@ export default function SkySection({ progressRef, apiRef }) {
   const [ready, setReady] = useState(false)
   const [visible, setVisible] = useState(false)
   const [tick, setTick] = useState(0)
+  const [hoverId, setHoverId] = useState(null)
+  const [light, setLight] = useState(false)
   const work = workId ? getWork(workId) : null
 
+  const skyRef = useRef(null)
   const hostRef = useRef(null)
+  const meteorsRef = useRef(null)
   const headerRef = useRef(null)
   const stelRef = useRef(null)
   const readyRef = useRef(false)
@@ -231,6 +236,69 @@ export default function SkySection({ progressRef, apiRef }) {
     return () => window.cancelAnimationFrame(raf)
   }, [ready, pairs])
 
+  // 하늘에 도착하면 몇 초에 한 번 별똥별이 지나간다.
+  useEffect(() => {
+    if (!ready) return undefined
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)')
+    return runMeteors(meteorsRef.current, () => progressRef.current > 0.985 && !document.hidden && !calm.matches, 3200)
+  }, [ready, progressRef])
+
+  // 마우스를 쓰는 화면에서는 커서 둘레만 어둠이 걷혀 가려진 별이 비친다.
+  useEffect(() => {
+    const sky = skyRef.current
+    const host = hostRef.current
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (!fine.matches || calm.matches) return undefined
+    setLight(true)
+    let raf = 0
+    let x = -999
+    let y = -999
+    const paint = () => {
+      raf = 0
+      sky.style.setProperty('--mx', `${x}px`)
+      sky.style.setProperty('--my', `${y}px`)
+    }
+    const queue = () => {
+      if (!raf) raf = window.requestAnimationFrame(paint)
+    }
+    const onMove = (e) => {
+      const r = host.getBoundingClientRect()
+      x = e.clientX - r.left
+      y = e.clientY - r.top
+      queue()
+    }
+    const onLeave = () => {
+      x = -999
+      y = -999
+      queue()
+    }
+    host.addEventListener('pointermove', onMove)
+    host.addEventListener('pointerleave', onLeave)
+    return () => {
+      window.cancelAnimationFrame(raf)
+      host.removeEventListener('pointermove', onMove)
+      host.removeEventListener('pointerleave', onLeave)
+      setLight(false)
+    }
+  }, [])
+
+  // 별을 누르면 그 자리에서 빛의 파문이 퍼진다.
+  const ripple = (btn) => {
+    if (reduceMotion() || !btn) return
+    const ns = 'http://www.w3.org/2000/svg'
+    const svg = document.createElementNS(ns, 'svg')
+    svg.setAttribute('class', 'star-ring')
+    svg.setAttribute('viewBox', '0 0 40 40')
+    const c = document.createElementNS(ns, 'circle')
+    c.setAttribute('cx', '20')
+    c.setAttribute('cy', '20')
+    c.setAttribute('r', '19')
+    svg.appendChild(c)
+    svg.addEventListener('animationend', () => svg.remove())
+    btn.appendChild(svg)
+  }
+
   // 작품 창은 주소를 바꾸지 않는다. 뒤로 가기는 창 닫기로 쓴다.
   const open = useCallback((id, opener) => {
     openerRef.current = opener || null
@@ -294,16 +362,18 @@ export default function SkySection({ progressRef, apiRef }) {
   }
 
   return (
-    <div id="sky" className={`sky${work ? ' has-detail' : ''}${visible ? ' is-visible' : ''}`}>
+    <div id="sky" ref={skyRef} className={`sky${work ? ' has-detail' : ''}${visible ? ' is-visible' : ''}${light ? ' has-light' : ''}`}>
       <div className="sky-host" ref={hostRef} style={{ backgroundImage: `url(${asset('/home-sky.jpg')})` }}>
         <div className="sky-tint" aria-hidden="true" />
         <div className="sky-dim" aria-hidden="true" />
+        <div className="meteors" ref={meteorsRef} aria-hidden="true" />
         <svg className="sky-lines" aria-hidden="true">
           {pairs.map(([a, b], i) => (
             <line
               key={`${a}-${b}`}
               ref={(el) => (lineRefs.current[i] = el)}
-              className={work && (work.id === a || work.id === b) ? 'is-on' : ''}
+              style={{ '--i': i }}
+              className={`${work && (work.id === a || work.id === b) ? 'is-on' : ''}${hoverId && (hoverId === a || hoverId === b) ? ' is-hot' : ''}`}
             />
           ))}
         </svg>
@@ -314,7 +384,13 @@ export default function SkySection({ progressRef, apiRef }) {
               type="button"
               ref={(el) => (markerRefs.current[w.id] = el)}
               className={`star${workId === w.id ? ' is-active' : ''}`}
-              onClick={(e) => open(w.id, e.currentTarget)}
+              style={{ '--i': i }}
+              onPointerEnter={() => setHoverId(w.id)}
+              onPointerLeave={() => setHoverId(null)}
+              onClick={(e) => {
+                ripple(e.currentTarget)
+                open(w.id, e.currentTarget)
+              }}
               aria-label={`${w.id} ${w.title || ''} ${w.author}`.replace(/\s+/g, ' ').trim()}
             >
               <span

@@ -21,6 +21,17 @@ export const colors = {
   starCore: '#ffffff',
   starGlowNear: 'rgba(199, 178, 255, 0.85)',
   starGlowFar: 'rgba(123, 82, 199, 0.5)',
+  meteorHead: 'rgba(255, 255, 255, 0.95)',
+  meteorTail: 'rgba(255, 255, 255, 0)',
+  maskLight: 'rgba(0, 0, 0, 0.38)', // 커서 둘레에서 어둠이 걷히는 정도
+  maskFull: '#000000',
+}
+
+// 첫 화면 별 캔버스에 쓰는 색(r, g, b). 캔버스는 CSS 변수를 못 읽어 숫자로 둔다.
+export const cosmos = {
+  white: '255,255,255',
+  violet: '199,178,255',
+  blue: '170,200,255',
 }
 
 // 하늘 엔진 화면을 사이트 색에 맞추는 값

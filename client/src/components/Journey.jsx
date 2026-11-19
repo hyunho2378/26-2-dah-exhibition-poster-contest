@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import HomeSection from './HomeSection.jsx'
+import HomeSection, { HomePhoto } from './HomeSection.jsx'
+import Cosmos from './Cosmos.jsx'
 import SkySection from './SkySection.jsx'
 import { sky as skyTokens } from '../tokens.js'
 
@@ -43,6 +44,7 @@ export default function Journey() {
         set('--home-s', calm ? '1' : (1 + 1.7 * smooth(0, 0.7, p)).toFixed(3))
         set('--sky-o', smooth(0.05, 0.45, p).toFixed(3))
         set('--ui-o', smooth(0.7, 1, p).toFixed(3))
+        set('--cos-o', (1 - smooth(0.8, 0.985, p)).toFixed(3))
         // 날아가는 동안에는 하늘이 밝고, 도착하면 번호 없는 별이 어두워지며 작품 별만 남는다.
         set('--dim-o', (0.18 + (skyTokens.dimOpacity - 0.18) * smooth(0.55, 1, p)).toFixed(3))
         stage.classList.toggle('is-top', p < 0.03)
@@ -64,6 +66,8 @@ export default function Journey() {
     <main className="journey" ref={journeyRef}>
       <div className="stage is-top" ref={stageRef}>
         <SkySection progressRef={progressRef} apiRef={skyApi} />
+        <HomePhoto />
+        <Cosmos stageRef={stageRef} progressRef={progressRef} />
         <HomeSection />
       </div>
       <span className="snap snap-top" aria-hidden="true" />
