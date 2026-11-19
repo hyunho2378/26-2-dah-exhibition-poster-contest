@@ -68,7 +68,7 @@ function setupSky(stel) {
   core.observer.utc = stel.date2MJD(obsData.utc)
   core.time_speed = 0
 
-  // 별을 조금 키우고 하늘을 조금 어둡게 한다.
+  // 번호 없는 별은 작고 어둡게 둔다. 작품 별은 화면 위에 따로 밝게 그린다.
   core.star_relative_scale = skyTokens.starRelativeScale
   core.star_linear_scale = skyTokens.starLinearScale
   core.bortle_index = skyTokens.bortle

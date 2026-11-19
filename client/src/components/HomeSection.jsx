@@ -1,23 +1,18 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
 import { site } from '../data/site.js'
-import { loadEngine } from '../engine/sky.js'
-import Footer from '../components/Footer.jsx'
 import { asset } from '../asset.js'
 
-export default function Home() {
-  useEffect(() => {
-    document.title = `${site.title}, ${site.term} ${site.subtitle}`
-    // 홈을 보는 동안 하늘 엔진을 미리 불러 둔다.
-    const t = window.setTimeout(() => loadEngine(), 1200)
-    return () => window.clearTimeout(t)
-  }, [])
+const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+export default function HomeSection() {
+  const goSky = (e) => {
+    e.preventDefault()
+    document.getElementById('sky')?.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' })
+  }
 
   return (
-    <div className="home">
-      <div className="home-sky" aria-hidden="true" style={{ backgroundImage: `url(${asset('/home-sky.jpg')})` }} />
-      <main className="home-main">
+    <section className="home" id="home">
+      <div className="home-bg" aria-hidden="true" style={{ backgroundImage: `url(${asset('/home-sky.jpg')})` }} />
+      <div className="home-main">
         <h1 className="home-title">
           <span data-optical="left">BEYOND</span>
           <span data-optical="left">THE KNOWN</span>
@@ -53,12 +48,10 @@ export default function Home() {
           </div>
         </dl>
 
-        <Link to="/sky" className="home-enter">
-          <span data-optical="left">출품작이 놓인 하늘</span>
-          <ArrowRight size={24} strokeWidth={1.5} aria-hidden="true" />
-        </Link>
-      </main>
-      <Footer />
-    </div>
+        <a href="#sky" className="home-enter" onClick={goSky} data-optical="left">
+          {site.enter}
+        </a>
+      </div>
+    </section>
   )
 }

@@ -17,18 +17,19 @@ export const colors = {
   scrim: 'rgba(11, 12, 29, 0.72)',
   focus: '#c7b2ff',
   skyTint: '#4a2bb0',      // 하늘 색을 포스터 남보라로 물들이는 색
+  dim: '#04051a',          // 작품이 아닌 별을 어둡게 누르는 색
   starCore: '#ffffff',
   starGlowNear: 'rgba(199, 178, 255, 0.85)',
-  starGlowFar: 'rgba(123, 82, 199, 0.45)',
+  starGlowFar: 'rgba(123, 82, 199, 0.5)',
 }
 
 // 하늘 엔진 화면을 사이트 색에 맞추는 값
 export const sky = {
-  tintOpacity: 0.52,
-  filter: 'brightness(0.74) contrast(1.18)',
-  starRelativeScale: 1.38, // 엔진 기본 1.1
-  starLinearScale: 1.0,    // 엔진 기본 0.8
-  limitMag: 5.6,           // 이보다 어두운 별은 그리지 않아 작품 별이 잘 보이게 한다
+  tintOpacity: 0.5,
+  dimOpacity: 0.64,        // 번호 없는 별을 얼마나 어둡게 누를지
+  starRelativeScale: 1.0,  // 엔진 기본 1.1
+  starLinearScale: 0.8,    // 엔진 기본 0.8
+  limitMag: 4.6,           // 이보다 어두운 별은 그리지 않는다
   bortle: 2,               // 하늘 밝기, 엔진 기본 3
 }
 
@@ -40,16 +41,19 @@ export const fonts = {
 
 // 글자 역할마다 크기, 굵기, 행간, 자간을 함께 정한다.
 export const type = {
-  hero:     { size: 'clamp(3.25rem, 2.1rem + 6.2vw, 10.5rem)', weight: 400, leading: 0.92, tracking: '-0.02em', font: 'display' },
-  title:    { size: 'clamp(1.75rem, 1.4rem + 1.5vw, 2.75rem)', weight: 500, leading: 1.15, tracking: '-0.015em', font: 'body' },
-  titleEn:  { size: 'clamp(1.75rem, 1.4rem + 1.5vw, 2.75rem)', weight: 400, leading: 1.1, tracking: '-0.01em', font: 'display' },
-  lead:     { size: 'clamp(1.0625rem, 0.98rem + 0.35vw, 1.3125rem)', weight: 500, leading: 1.5, tracking: '-0.005em', font: 'body' },
-  body:     { size: 'clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem)', weight: 400, leading: 1.75, tracking: '0em', font: 'body' },
-  label:    { size: '0.75rem', weight: 500, leading: 1.4, tracking: '0.12em', font: 'mono' },
-  meta:     { size: '0.8125rem', weight: 400, leading: 1.5, tracking: '0.02em', font: 'mono' },
-  nav:      { size: '0.875rem', weight: 500, leading: 1.2, tracking: '0.04em', font: 'body' },
-  starNum:  { size: '0.6875rem', weight: 500, leading: 1, tracking: '0.06em', font: 'mono' },
-  starName: { size: '0.8125rem', weight: 500, leading: 1.3, tracking: '-0.005em', font: 'body' },
+  hero:        { size: 'clamp(3.25rem, 2.1rem + 6.2vw, 10.5rem)', weight: 400, leading: 0.92, tracking: '-0.02em', font: 'display' },
+  title:       { size: 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)', weight: 500, leading: 1.15, tracking: '-0.015em', font: 'body' },
+  titleEn:     { size: 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)', weight: 400, leading: 1.1, tracking: '-0.01em', font: 'display' },
+  lead:        { size: 'clamp(1.0625rem, 0.98rem + 0.35vw, 1.3125rem)', weight: 500, leading: 1.5, tracking: '-0.005em', font: 'body' },
+  body:        { size: 'clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem)', weight: 400, leading: 1.75, tracking: '0em', font: 'body' },
+  meta:        { size: 'clamp(0.75rem, 0.72rem + 0.08vw, 1rem)', weight: 400, leading: 1.5, tracking: '0.02em', font: 'mono' },
+  nav:         { size: '0.875rem', weight: 500, leading: 1.2, tracking: '0.04em', font: 'body' },
+  starNum:     { size: '0.6875rem', weight: 500, leading: 1, tracking: '0.06em', font: 'mono' },
+  starName:    { size: '0.8125rem', weight: 500, leading: 1.3, tracking: '-0.005em', font: 'body' },
+  detailTitle: { size: 'clamp(1.3125rem, 1.1rem + 0.5vw, 2rem)', weight: 600, leading: 1.25, tracking: '-0.015em', font: 'body' },
+  detailAuthor:{ size: 'clamp(0.9375rem, 0.9rem + 0.12vw, 1.375rem)', weight: 500, leading: 1.5, tracking: '-0.005em', font: 'body' },
+  detailBody:  { size: 'clamp(0.9375rem, 0.88rem + 0.1vw, 1.25rem)', weight: 400, leading: 1.78, tracking: '0em', font: 'body' },
+  detailHead:  { size: 'clamp(0.9375rem, 0.9rem + 0.12vw, 1.3125rem)', weight: 600, leading: 1.5, tracking: '-0.005em', font: 'body' },
 }
 
 export const space = {
@@ -59,9 +63,11 @@ export const space = {
 export const layout = {
   gutter: 'clamp(20px, 4.4vw, 72px)', // 헤더와 본문, 푸터가 같은 값을 쓴다
   maxWidth: '2200px',
-  panelWidth: 'clamp(400px, 36vw, 760px)',
-  panelPad: 'clamp(20px, 2.2vw, 44px)', // 작품 창 안쪽 좌우 여백, 그림과 글과 단추가 같은 선에서 시작한다
   headerHeight: '72px',
+  detailGap: 'clamp(32px, 3.3vw, 64px)',   // 포스터와 글 사이
+  detailPadB: 'clamp(24px, 4svh, 48px)',   // 포스터 아래 여백
+  posterRatio: '1.4142',                   // A2 세로
+  textW: 'clamp(300px, 24vw, 720px)',      // 작품 글 칸
 }
 
 export const radius = { base: '6px' }
@@ -79,12 +85,12 @@ export const motion = {
   base: '360ms',
   slow: '900ms',
   ease: 'cubic-bezier(0.2, 0.7, 0.2, 1)',
-  skyMove: 1.2, // 별로 다가가는 시간(초)
+  skyFit: 0.7, // 작품 창이 열고 닫힐 때 하늘이 자리를 옮기는 시간(초)
 }
 
 export const z = { sky: 0, overlay: 10, header: 20, panel: 30, index: 40 }
 
-export const breakpoints = { md: 768, lg: 1024 }
+export const breakpoints = { md: 768, xl: 1280 }
 
 // tokens를 CSS 변수로 옮긴다. 스타일 파일은 이 변수만 쓴다.
 // 사용자 설정(고대비)이 덮어쓸 수 있게 head 맨 앞의 :root 규칙으로 넣는다.
@@ -103,7 +109,7 @@ export function tokenVars() {
   Object.entries(layout).forEach(([k, val]) => (v[`--l-${k}`] = val))
   v['--r-base'] = radius.base
   v['--sky-tint-opacity'] = String(sky.tintOpacity)
-  v['--sky-filter'] = sky.filter
+  v['--sky-dim-opacity'] = String(sky.dimOpacity)
   Object.entries(shadow).forEach(([k, val]) => (v[`--e-${k}`] = val))
   v['--m-fast'] = motion.fast
   v['--m-base'] = motion.base

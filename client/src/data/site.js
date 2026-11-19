@@ -19,8 +19,7 @@ export const site = {
     '웹사이트 제작/수정 문의: 주현호 (h20222583@glab.hallym.ac.kr)',
   ],
   dahLink: 'https://sites.google.com/glab.hallym.ac.kr/dah-hallym/about?authuser=0',
-  sourceLink: 'https://github.com/hyunho2378/26-2-dah-exhibition-poster-contest',
-  engineCredit: 'Sky rendering: Stellarium Web Engine, AGPL-3.0',
+  enter: 'Works in the Sky',
 }
 
 // 하늘을 보는 자리와 시각: 한림대학교, 전시 첫날 밤 11시 30분

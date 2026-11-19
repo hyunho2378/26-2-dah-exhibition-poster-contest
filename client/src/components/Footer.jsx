@@ -5,13 +5,16 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-text">
         {site.footer.map((line) => (
-          <p key={line} data-optical="left">{line}</p>
+          <p key={line} data-optical="left">
+            {line.split(/ (?=X )/).map((part, i) => (
+              <span key={part} className="phrase">{i ? ' ' : ''}{part}</span>
+            ))}
+          </p>
         ))}
       </div>
-      <div className="footer-links">
-        <a data-optical="right" href={site.dahLink} target="_blank" rel="noopener noreferrer">Hallym University DAH</a>
-        <a data-optical="right" href={site.sourceLink} target="_blank" rel="noopener noreferrer">{site.engineCredit}</a>
-      </div>
+      <a className="footer-link" data-optical="right" href={site.dahLink} target="_blank" rel="noopener noreferrer">
+        Hallym University DAH
+      </a>
     </footer>
   )
 }
