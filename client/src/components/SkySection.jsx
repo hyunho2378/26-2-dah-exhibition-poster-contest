@@ -1,16 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { List } from 'lucide-react'
 import { works, getWork } from '../data/works.js'
 import { site } from '../data/site.js'
 import { motion as motionTokens, breakpoints } from '../tokens.js'
 import { asset } from '../asset.js'
+import { goHome } from '../journey.js'
 import { getCanvas, loadEngine, projectObj, fitView } from '../engine/sky.js'
 import DetailPanel from './DetailPanel.jsx'
 import WorksIndex from './WorksIndex.jsx'
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x))
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
+const WARP_FOV = 160 // 여정이 시작될 때 카메라가 보는 하늘 폭(도)
 
-export default function SkySection() {
+export default function SkySection({ progressRef, apiRef }) {
   const [workId, setWorkId] = useState(null)
   const [indexOpen, setIndexOpen] = useState(false)
   const [ready, setReady] = useState(false)
@@ -18,15 +22,16 @@ export default function SkySection() {
   const [tick, setTick] = useState(0)
   const work = workId ? getWork(workId) : null
 
-  const sectionRef = useRef(null)
   const hostRef = useRef(null)
   const headerRef = useRef(null)
   const stelRef = useRef(null)
+  const readyRef = useRef(false)
   const objsRef = useRef({})
   const markerRefs = useRef({})
   const lineRefs = useRef([])
+  const fitCache = useRef(null)
   const visibleRef = useRef(false)
-  const firstRef = useRef(true)
+  const arrivedRef = useRef(false)
   const openerRef = useRef(null)
   const workIdRef = useRef(null)
   const prevWork = useRef(null)
@@ -56,8 +61,10 @@ export default function SkySection() {
             }
           })
           tries += 1
-          if (missing === 0 || tries > 60) setReady(true)
-          else window.setTimeout(find, 200)
+          if (missing === 0 || tries > 60) {
+            readyRef.current = true
+            setReady(true)
+          } else window.setTimeout(find, 200)
         }
         find()
       })
@@ -69,53 +76,92 @@ export default function SkySection() {
     }
   }, [])
 
-  // 하늘 구간이 보일 때만 엔진이 그린다.
-  useEffect(() => {
-    const el = sectionRef.current
-    const io = new IntersectionObserver(
-      ([e]) => {
-        visibleRef.current = e.isIntersecting
-        setVisible(e.isIntersecting)
-        if (stelRef.current) stelRef.current.paused = !e.isIntersecting
-      },
-      { threshold: 0.15 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
-  // 번호 붙은 별 전체를 지금 하늘 칸에 꼭 맞게 담는다.
-  const fit = useCallback((duration) => {
+  // 번호 붙은 별 전체를 지금 하늘 칸에 꼭 맞게 담는 방향과 시야각
+  const computeFit = useCallback(() => {
     const stel = stelRef.current
     const host = hostRef.current
-    if (!stel || !host) return
-    const objs = works.map((w) => objsRef.current[w.id]).filter(Boolean)
-    if (!objs.length) return
+    if (!stel || !host || !readyRef.current) return null
     const W = host.clientWidth
     const H = host.clientHeight
+    const c = fitCache.current
+    if (c && c.W === W && c.H === H) return c
+    const objs = works.map((w) => objsRef.current[w.id]).filter(Boolean)
+    if (!objs.length || !W || !H) return null
     const g = Math.max(24, Math.min(72, W * 0.044))
     const small = W < breakpoints.md
     const { dir, fov } = fitView(stel, objs, W, H, {
       top: small ? 96 : 112,
-      bottom: small ? 72 : 72,
+      bottom: 72,
       left: g + 8,
       right: g + (small ? 36 : 56),
     })
-    stel.core.lock = 0
-    stel.lookAt(dir, duration)
-    stel.zoomTo(Math.min(fov, 175 * stel.D2R), duration)
+    fitCache.current = { W, H, dir, fov: Math.min(fov, 175 * stel.D2R) }
+    return fitCache.current
   }, [])
 
+  const fit = useCallback(
+    (duration) => {
+      const stel = stelRef.current
+      const f = computeFit()
+      if (!stel || !f) return
+      stel.core.lock = 0
+      stel.lookAt(f.dir, duration)
+      stel.zoomTo(f.fov, duration)
+    },
+    [computeFit],
+  )
+
+  // 여정 진행도 p에 맞춰 카메라를 정한다. p가 0에 가까울수록 넓게 보고, 1에서 별자리 전체에 딱 맞는다.
+  // 여정 안에서는 시야각이 줄어들며 별이 사방으로 퍼져 나가 앞으로 빨려 들어가는 느낌이 난다.
+  const applyProgress = useCallback(
+    (p) => {
+      const on = p > 0.04
+      if (visibleRef.current !== on) {
+        visibleRef.current = on
+        setVisible(on)
+        if (stelRef.current) stelRef.current.paused = !on
+      }
+      const stel = stelRef.current
+      const f = computeFit()
+      if (!stel || !f) return
+      if (p >= 0.999) {
+        if (!arrivedRef.current) {
+          arrivedRef.current = true
+          stel.core.lock = 0
+          stel.lookAt(f.dir, 0)
+          stel.zoomTo(f.fov, 0)
+        }
+        return
+      }
+      arrivedRef.current = false
+      const e = reduceMotion() ? 1 : easeOutCubic(clamp((p - 0.05) / 0.95))
+      const wide = WARP_FOV * stel.D2R
+      const fov = Math.exp(Math.log(wide) + (Math.log(f.fov) - Math.log(wide)) * e)
+      stel.core.lock = 0
+      stel.lookAt(f.dir, 0)
+      stel.zoomTo(Math.min(fov, 175 * stel.D2R), 0)
+    },
+    [computeFit],
+  )
+
+  useImperativeHandle(apiRef, () => ({ applyProgress }), [applyProgress])
+
+  // 엔진이 준비되면 지금 진행도에 맞춰 한 번 맞춘다.
   useEffect(() => {
     if (!ready) return
+    arrivedRef.current = false
+    applyProgress(progressRef.current)
+  }, [ready, applyProgress, progressRef])
+
+  // 하늘에 도착한 뒤 작품 창이 열리고 닫히거나 창 크기가 바뀌면 하늘이 자리를 옮긴다.
+  useEffect(() => {
+    if (!ready) return
+    if (progressRef.current < 0.999) return
     const wide = window.innerWidth >= breakpoints.xl
     if (workId && !wide) return // 좁은 화면은 작품 창이 하늘을 덮는다
-    const d = firstRef.current || reduceMotion() ? 0 : motionTokens.skyFit
-    firstRef.current = false
-    fit(d)
-  }, [ready, workId, tick, fit])
+    fit(reduceMotion() ? 0 : motionTokens.skyFit)
+  }, [ready, workId, tick, fit, progressRef])
 
-  // 창 크기가 바뀌면 하늘 구도를 다시 맞춘다.
   useEffect(() => {
     let timer = 0
     let last = { w: window.innerWidth, h: window.innerHeight }
@@ -126,6 +172,7 @@ export default function SkySection() {
         const h = window.innerHeight
         if (w !== last.w || Math.abs(h - last.h) > 120) {
           last = { w, h }
+          fitCache.current = null
           setTick((t) => t + 1)
         }
       }, 200)
@@ -227,6 +274,13 @@ export default function SkySection() {
     return () => window.removeEventListener('keydown', onKey)
   }, [indexOpen, close])
 
+  // 작품 창이나 목록이 열려 있는 동안에는 페이지가 스크롤되지 않는다.
+  useEffect(() => {
+    const locked = Boolean(workId) || indexOpen
+    document.documentElement.classList.toggle('is-locked', locked)
+    return () => document.documentElement.classList.remove('is-locked')
+  }, [workId, indexOpen])
+
   // 작품 창이 하늘 전체를 덮을 때는 뒤쪽 하늘과 머리글에 닿지 않게 한다.
   useEffect(() => {
     const covers = Boolean(workId) && window.innerWidth < breakpoints.xl
@@ -234,17 +288,13 @@ export default function SkySection() {
     headerRef.current?.toggleAttribute('inert', covers)
   }, [workId, tick])
 
-  const goHome = (e) => {
+  const back = (e) => {
     e.preventDefault()
-    document.getElementById('home')?.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' })
+    goHome()
   }
 
   return (
-    <section
-      id="sky"
-      ref={sectionRef}
-      className={`sky${work ? ' has-detail' : ''}${visible ? ' is-visible' : ''}`}
-    >
+    <div id="sky" className={`sky${work ? ' has-detail' : ''}${visible ? ' is-visible' : ''}`}>
       <div className="sky-host" ref={hostRef} style={{ backgroundImage: `url(${asset('/home-sky.jpg')})` }}>
         <div className="sky-tint" aria-hidden="true" />
         <div className="sky-dim" aria-hidden="true" />
@@ -287,7 +337,7 @@ export default function SkySection() {
       </div>
 
       <header className="sky-header" ref={headerRef}>
-        <a href="#home" className="sky-logo" data-optical="left" onClick={goHome}>{site.title}</a>
+        <a href="#home" className="sky-logo" data-optical="left" onClick={back}>{site.title}</a>
         <button type="button" className="btn-raised" onClick={() => setIndexOpen(true)} aria-label="작품 목록" aria-expanded={indexOpen}>
           <List size={20} strokeWidth={1.5} aria-hidden="true" />
         </button>
@@ -295,6 +345,6 @@ export default function SkySection() {
 
       <DetailPanel work={work} onClose={close} />
       <WorksIndex open={indexOpen} current={work?.id} onClose={() => setIndexOpen(false)} onPick={(id) => open(id, null)} />
-    </section>
+    </div>
   )
 }

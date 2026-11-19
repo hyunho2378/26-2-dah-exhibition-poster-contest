@@ -1,16 +1,15 @@
 import { site } from '../data/site.js'
 import { asset } from '../asset.js'
-
-const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+import { goSky } from '../journey.js'
 
 export default function HomeSection() {
-  const goSky = (e) => {
+  const enter = (e) => {
     e.preventDefault()
-    document.getElementById('sky')?.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' })
+    goSky()
   }
 
   return (
-    <section className="home" id="home">
+    <div className="home" id="home">
       <div className="home-bg" aria-hidden="true" style={{ backgroundImage: `url(${asset('/home-sky.jpg')})` }} />
       <div className="home-main">
         <h1 className="home-title">
@@ -48,10 +47,10 @@ export default function HomeSection() {
           </div>
         </dl>
 
-        <a href="#sky" className="home-enter" onClick={goSky} data-optical="left">
+        <a href="#sky" className="home-enter" onClick={enter} data-optical="left">
           {site.enter}
         </a>
       </div>
-    </section>
+    </div>
   )
 }

@@ -8,6 +8,7 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
+html.is-locked { overflow: hidden; }
 body {
   margin: 0;
   font-family: var(--t-body-font);
@@ -50,8 +51,27 @@ p, dd, li { text-wrap: pretty; }
 .btn-raised:hover { transform: translateY(-1px); }
 .btn-raised:active { transform: scale(0.97); }
 
+/* 홈에서 하늘로 가는 여정: 스크롤 길이만큼 화면이 고정되고, 그 안에서 홈이 지나가며 하늘로 빨려 들어간다 */
+.journey { --travel: 130svh; position: relative; height: calc(100svh + var(--travel)); }
+.stage {
+  --home-o: 1; --home-s: 1; --sky-o: 0; --ui-o: 0;
+  position: sticky; top: 0; height: 100svh; overflow: hidden;
+  background: var(--c-night);
+}
+.stage.is-top .sky { visibility: hidden; }
+.stage.is-away .home { visibility: hidden; }
+.stage:not(.is-top) .home { pointer-events: none; }
+.stage:not(.is-arrived) .star, .stage:not(.is-arrived) .sky-header > * { pointer-events: none; }
+.snap { position: absolute; left: 0; width: 100%; height: 1px; pointer-events: none; scroll-snap-align: start; scroll-snap-stop: always; }
+.snap-top { top: 0; }
+.snap-sky { top: var(--travel); }
+
 /* 홈 */
-.home { position: relative; min-height: 100svh; scroll-snap-align: start; scroll-snap-stop: always; }
+.home {
+  position: absolute; inset: 0; z-index: 2; overflow: hidden;
+  opacity: var(--home-o); transform: scale(var(--home-s)); transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
 .home-bg {
   position: absolute; inset: 0;
   background-color: var(--c-night);
@@ -61,7 +81,7 @@ p, dd, li { text-wrap: pretty; }
 .home-main {
   container-type: inline-size;
   position: relative;
-  min-height: 100svh;
+  height: 100%;
   padding: clamp(32px, 8svh, 72px) var(--l-gutter) clamp(32px, 7svh, 64px);
   display: grid;
   grid-template-rows: auto auto 1fr auto auto;
@@ -161,9 +181,8 @@ p, dd, li { text-wrap: pretty; }
   --core: 10px;
   --poster-w: min(calc((100svh - var(--band) - var(--pad-b)) / var(--ratio)), 44vw);
   --poster-h: calc(var(--poster-w) * var(--ratio));
-  position: relative; height: 100svh; min-height: 520px; overflow: hidden;
-  background: var(--c-night);
-  scroll-snap-align: start; scroll-snap-stop: always;
+  position: absolute; inset: 0; z-index: 1; overflow: hidden;
+  background: var(--c-night); opacity: var(--sky-o);
 }
 @media (max-width: 767px) { .sky { --reticle: 34px; } }
 .sky-host {
@@ -172,10 +191,10 @@ p, dd, li { text-wrap: pretty; }
 }
 .sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
 /* 번호 없는 별은 어둡게 눌러 두고, 번호 붙은 별만 빛나게 한다 */
-.sky-dim { position: absolute; inset: 0; pointer-events: none; background: var(--c-dim); opacity: var(--sky-dim-opacity); }
+.sky-dim { position: absolute; inset: 0; pointer-events: none; background: var(--c-dim); opacity: var(--dim-o, var(--sky-dim-opacity)); }
 /* 엔진의 회청색 하늘을 포스터의 남보라 색감으로 맞춘다 */
 .sky-tint { position: absolute; inset: 0; pointer-events: none; background: var(--c-skyTint); mix-blend-mode: color; opacity: var(--sky-tint-opacity); }
-.sky-lines, .sky-markers { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.sky-lines, .sky-markers { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: var(--ui-o); }
 .sky-lines line { stroke: var(--c-line); stroke-width: 1; }
 .sky-lines line.is-on { stroke: var(--c-violetBright); }
 
@@ -229,7 +248,7 @@ p, dd, li { text-wrap: pretty; }
   height: var(--band); padding: env(safe-area-inset-top) var(--l-gutter) 0;
   display: flex; align-items: center; justify-content: space-between;
   container-type: inline-size;
-  pointer-events: none;
+  pointer-events: none; opacity: var(--ui-o);
 }
 .sky-header > * { pointer-events: auto; }
 .sky-header .btn-raised { margin-left: auto; }

@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { applyOptical } from './optical.js'
-import HomeSection from './components/HomeSection.jsx'
-import SkySection from './components/SkySection.jsx'
+import Journey from './components/Journey.jsx'
 import Footer from './components/Footer.jsx'
 
 // 화면이 바뀌거나 폭이 바뀔 때마다 글자 윤곽 정렬을 다시 잰다.
@@ -29,10 +28,7 @@ export default function App() {
   useOpticalAlign()
   return (
     <>
-      <main>
-        <HomeSection />
-        <SkySection />
-      </main>
+      <Journey />
       <Footer />
     </>
   )
