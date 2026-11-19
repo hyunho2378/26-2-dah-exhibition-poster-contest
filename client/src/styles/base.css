@@ -180,6 +180,10 @@ html.is-sky { overflow: hidden; scrollbar-gutter: auto; }
   color: var(--c-white); opacity: 0; transition: opacity var(--m-fast) var(--m-ease);
   white-space: normal; width: max-content; max-width: 15em; text-wrap: balance;
 }
+.star[data-label='left'] .star-num, .star[data-label='left'] .star-name { left: auto; right: calc(22px + var(--reticle) / 2 + 4px); text-align: right; }
+.star[data-label='top'] .star-num { left: 50%; transform: translateX(-50%); top: calc(22px - var(--reticle) / 2 - 16px); }
+.star[data-label='bottom'] .star-num { left: 50%; transform: translateX(-50%); top: calc(22px + var(--reticle) / 2 + 3px); }
+.star[data-label='top'] .star-name, .star[data-label='bottom'] .star-name { top: calc(22px + var(--reticle) / 2 + 18px); left: 50%; transform: translateX(-50%); text-align: center; }
 .star:hover .star-name, .star:focus-visible .star-name, .star.is-active .star-name { opacity: 1; }
 .sky-loading {
   position: absolute; inset: 0; display: grid; place-items: center;

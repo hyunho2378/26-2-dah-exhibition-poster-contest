@@ -122,6 +122,42 @@ export default function Sky() {
             el.style.visibility = 'hidden'
           }
         })
+        // 번호 글자는 별 오른쪽이 기본이고, 다른 별 표식이나 번호와 겹치거나 화면 밖으로 나가면 왼쪽, 위, 아래 중 덜 겹치는 자리에 둔다.
+        const R = W < breakpoints.md ? 32 : 46
+        const LW = 22
+        const LH = 13
+        const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
+        const reticles = works
+          .filter((o) => pos[o.id])
+          .map((o) => ({ id: o.id, x: pos[o.id].x - R / 2, y: pos[o.id].y - R / 2, w: R, h: R }))
+        const placed = []
+        works.forEach((w) => {
+          const p = pos[w.id]
+          const el = markerRefs.current[w.id]
+          if (!p || !el) return
+          const top = p.y - R / 2
+          const cands = [
+            { side: 'right', x: p.x + R / 2 + 4, y: top, w: LW, h: LH },
+            { side: 'left', x: p.x - R / 2 - 4 - LW, y: top, w: LW, h: LH },
+            { side: 'top', x: p.x - LW / 2, y: top - LH - 3, w: LW, h: LH },
+            { side: 'bottom', x: p.x - LW / 2, y: p.y + R / 2 + 3, w: LW, h: LH },
+          ]
+          const cost = (b) =>
+            reticles.filter((r) => r.id !== w.id && hit(b, r)).length +
+            placed.filter((q) => hit(b, q)).length +
+            (b.x < 0 || b.x + b.w > W || b.y < 0 || b.y + b.h > H ? 5 : 0)
+          let best = cands[0]
+          let bestCost = cost(best)
+          cands.slice(1).forEach((c) => {
+            const v = cost(c)
+            if (v < bestCost) {
+              best = c
+              bestCost = v
+            }
+          })
+          placed.push(best)
+          if (el.dataset.label !== best.side) el.dataset.label = best.side
+        })
         pairs.forEach(([a, b], i) => {
           const ln = lineRefs.current[i]
           if (!ln) return
