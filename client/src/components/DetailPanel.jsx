@@ -67,7 +67,7 @@ export default function DetailPanel({ work, onClose }) {
 
   useEffect(() => {
     rootRef.current?.toggleAttribute('inert', !work)
-    if (work && !wasOpen.current) closeRef.current?.focus({ preventScroll: true })
+    if (work && !wasOpen.current) closeRef.current?.focus({ preventScroll: true, focusVisible: false })
     wasOpen.current = Boolean(work)
   }, [work])
 
@@ -93,7 +93,6 @@ export default function DetailPanel({ work, onClose }) {
             </h2>
             {w.title ? <p className="detail-author" data-optical="left">{w.author}</p> : null}
             <p className="detail-meta" data-optical="left">
-              <span>{w.id}</span>
               <span>{w.studentId}</span>
               <span>{w.department}</span>
             </p>

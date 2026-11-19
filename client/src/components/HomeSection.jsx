@@ -10,6 +10,10 @@ export function HomePhoto() {
   )
 }
 
+export function HomeScrim() {
+  return <div className="home-scrim" aria-hidden="true" />
+}
+
 export default function HomeSection() {
   const enter = (e) => {
     e.preventDefault()

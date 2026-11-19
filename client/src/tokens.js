@@ -25,6 +25,11 @@ export const colors = {
   meteorTail: 'rgba(255, 255, 255, 0)',
   maskLight: 'rgba(0, 0, 0, 0.38)', // 커서 둘레에서 어둠이 걷히는 정도
   maskFull: '#000000',
+  // 첫 화면 글자 뒤를 어둡게 눌러 별과 겹쳐도 글이 또렷하게 읽히게 한다(글이 있는 왼쪽이 가장 어둡다)
+  homeDim1: 'rgba(4, 5, 26, 0.78)',
+  homeDim2: 'rgba(4, 5, 26, 0.6)',
+  homeDim3: 'rgba(4, 5, 26, 0.22)',
+  homeDim4: 'rgba(4, 5, 26, 0)',
 }
 
 // 첫 화면 별 캔버스에 쓰는 색(r, g, b). 캔버스는 CSS 변수를 못 읽어 숫자로 둔다.
@@ -44,22 +49,21 @@ export const sky = {
   bortle: 2,               // 하늘 밝기, 엔진 기본 3
 }
 
+// 글꼴은 프리텐다드 하나만 쓴다. 숫자는 tabular-nums로 자리를 맞춘다.
 export const fonts = {
-  display: "'Playfair Display', 'Pretendard Variable', Pretendard, serif",
   body: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif",
-  mono: "'IBM Plex Mono', 'Pretendard Variable', ui-monospace, monospace",
 }
 
 // 글자 역할마다 크기, 굵기, 행간, 자간을 함께 정한다.
 export const type = {
-  hero:        { size: 'clamp(3.25rem, 2.1rem + 6.2vw, 10.5rem)', weight: 400, leading: 0.92, tracking: '-0.02em', font: 'display' },
+  hero:        { size: 'clamp(3rem, 2rem + 5.4vw, 9.5rem)', weight: 600, leading: 0.98, tracking: '-0.04em', font: 'body' },
   title:       { size: 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)', weight: 500, leading: 1.15, tracking: '-0.015em', font: 'body' },
-  titleEn:     { size: 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)', weight: 400, leading: 1.1, tracking: '-0.01em', font: 'display' },
+  titleEn:     { size: 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)', weight: 500, leading: 1.15, tracking: '-0.025em', font: 'body' },
   lead:        { size: 'clamp(1.0625rem, 0.98rem + 0.35vw, 1.3125rem)', weight: 500, leading: 1.5, tracking: '-0.005em', font: 'body' },
   body:        { size: 'clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem)', weight: 400, leading: 1.75, tracking: '0em', font: 'body' },
-  meta:        { size: 'clamp(0.75rem, 0.72rem + 0.08vw, 1rem)', weight: 400, leading: 1.5, tracking: '0.02em', font: 'mono' },
+  meta:        { size: 'clamp(0.75rem, 0.72rem + 0.08vw, 1rem)', weight: 400, leading: 1.5, tracking: '0.02em', font: 'body' },
   nav:         { size: '0.875rem', weight: 500, leading: 1.2, tracking: '0.04em', font: 'body' },
-  starNum:     { size: '0.6875rem', weight: 500, leading: 1, tracking: '0.06em', font: 'mono' },
+  starNum:     { size: '0.6875rem', weight: 500, leading: 1, tracking: '0.06em', font: 'body' },
   starName:    { size: '0.8125rem', weight: 500, leading: 1.3, tracking: '-0.005em', font: 'body' },
   detailTitle: { size: 'clamp(1.3125rem, 1.1rem + 0.5vw, 2rem)', weight: 600, leading: 1.25, tracking: '-0.015em', font: 'body' },
   detailAuthor:{ size: 'clamp(0.9375rem, 0.9rem + 0.12vw, 1.375rem)', weight: 500, leading: 1.5, tracking: '-0.005em', font: 'body' },

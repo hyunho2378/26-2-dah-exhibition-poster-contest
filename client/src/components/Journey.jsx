@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import HomeSection, { HomePhoto } from './HomeSection.jsx'
+import HomeSection, { HomePhoto, HomeScrim } from './HomeSection.jsx'
 import Cosmos from './Cosmos.jsx'
 import SkySection from './SkySection.jsx'
 import { sky as skyTokens } from '../tokens.js'
@@ -68,6 +68,7 @@ export default function Journey() {
         <SkySection progressRef={progressRef} apiRef={skyApi} />
         <HomePhoto />
         <Cosmos stageRef={stageRef} progressRef={progressRef} />
+        <HomeScrim />
         <HomeSection />
       </div>
       <span className="snap snap-top" aria-hidden="true" />

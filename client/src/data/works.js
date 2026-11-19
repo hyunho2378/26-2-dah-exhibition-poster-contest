@@ -38,7 +38,6 @@ export const works = source
   .map((w) => ({
     ...w,
     ...stars[w.id],
-    thumb: asset(`/works/${w.id}-thumb.jpg`),
     full: asset(`/works/${w.id}-full.jpg`),
     motion: motion.has(w.id) ? asset(`/works/${w.id}-motion.mp4`) : null,
     award: awards[w.id] ?? null,
@@ -46,12 +45,4 @@ export const works = source
 
 export function getWork(id) {
   return works.find((w) => w.id === id) ?? null
-}
-
-export function getAdjacent(id) {
-  const i = works.findIndex((w) => w.id === id)
-  return {
-    prev: i > 0 ? works[i - 1] : works[works.length - 1],
-    next: i < works.length - 1 ? works[i + 1] : works[0],
-  }
 }

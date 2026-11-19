@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { List } from 'lucide-react'
 import { works, getWork } from '../data/works.js'
 import { site } from '../data/site.js'
 import { motion as motionTokens, breakpoints } from '../tokens.js'
@@ -8,7 +7,6 @@ import { goHome } from '../journey.js'
 import { runMeteors } from '../fx/meteor.js'
 import { getCanvas, loadEngine, projectObj, fitView } from '../engine/sky.js'
 import DetailPanel from './DetailPanel.jsx'
-import WorksIndex from './WorksIndex.jsx'
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x))
@@ -17,7 +15,6 @@ const WARP_FOV = 160 // 여정이 시작될 때 카메라가 보는 하늘 폭(�
 
 export default function SkySection({ progressRef, apiRef }) {
   const [workId, setWorkId] = useState(null)
-  const [indexOpen, setIndexOpen] = useState(false)
   const [ready, setReady] = useState(false)
   const [visible, setVisible] = useState(false)
   const [tick, setTick] = useState(0)
@@ -302,7 +299,6 @@ export default function SkySection({ progressRef, apiRef }) {
   // 작품 창은 주소를 바꾸지 않는다. 뒤로 가기는 창 닫기로 쓴다.
   const open = useCallback((id, opener) => {
     openerRef.current = opener || null
-    setIndexOpen(false)
     if (!workIdRef.current) window.history.pushState({ work: id }, '')
     else window.history.replaceState({ work: id }, '')
     workIdRef.current = id
@@ -332,22 +328,34 @@ export default function SkySection({ progressRef, apiRef }) {
     prevWork.current = workId
   }, [workId])
 
+  // 키보드: 방향키(위아래, 양옆)로 이전과 다음 작품, Esc로 닫기
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key !== 'Escape') return
-      if (indexOpen) setIndexOpen(false)
-      else if (workIdRef.current) close()
+      if (e.key === 'Escape') {
+        if (workIdRef.current) close()
+        return
+      }
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return
+      if (progressRef.current < 0.985) return // 하늘에 도착하기 전에는 페이지 스크롤로 둔다
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
+      const tag = document.activeElement?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      e.preventDefault()
+      const dir = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1
+      const ids = works.map((w) => w.id)
+      const cur = workIdRef.current ? ids.indexOf(workIdRef.current) : dir > 0 ? -1 : 0
+      open(ids[(cur + dir + ids.length) % ids.length], null)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [indexOpen, close])
+  }, [close, open, progressRef])
 
-  // 작품 창이나 목록이 열려 있는 동안에는 페이지가 스크롤되지 않는다.
+  // 작품 창이 열려 있는 동안에는 페이지가 스크롤되지 않는다.
   useEffect(() => {
-    const locked = Boolean(workId) || indexOpen
+    const locked = Boolean(workId)
     document.documentElement.classList.toggle('is-locked', locked)
     return () => document.documentElement.classList.remove('is-locked')
-  }, [workId, indexOpen])
+  }, [workId])
 
   // 작품 창이 하늘 전체를 덮을 때는 뒤쪽 하늘과 머리글에 닿지 않게 한다.
   useEffect(() => {
@@ -414,13 +422,9 @@ export default function SkySection({ progressRef, apiRef }) {
 
       <header className="sky-header" ref={headerRef}>
         <a href="#home" className="sky-logo" data-optical="left" onClick={back}>{site.title}</a>
-        <button type="button" className="btn-raised" onClick={() => setIndexOpen(true)} aria-label="작품 목록" aria-expanded={indexOpen}>
-          <List size={20} strokeWidth={1.5} aria-hidden="true" />
-        </button>
       </header>
 
       <DetailPanel work={work} onClose={close} />
-      <WorksIndex open={indexOpen} current={work?.id} onClose={() => setIndexOpen(false)} onPick={(id) => open(id, null)} />
     </div>
   )
 }
