@@ -16,6 +16,16 @@ export const colors = {
   textSubHigh: '#e2e3f2',               // 고대비 설정
   scrim: 'rgba(11, 12, 29, 0.72)',
   focus: '#c7b2ff',
+  skyTint: '#3d2b9e',      // 하늘 색을 포스터 남보라로 물들이는 색
+}
+
+// 하늘 엔진 화면을 사이트 색에 맞추는 값
+export const sky = {
+  tintOpacity: 0.42,
+  filter: 'brightness(0.74) contrast(1.18)',
+  starRelativeScale: 1.22, // 엔진 기본 1.1
+  starLinearScale: 0.9,    // 엔진 기본 0.8
+  bortle: 2,               // 하늘 밝기, 엔진 기본 3
 }
 
 export const fonts = {
@@ -88,6 +98,8 @@ export function tokenVars() {
   Object.entries(space).forEach(([k, val]) => (v[`--s-${k}`] = val))
   Object.entries(layout).forEach(([k, val]) => (v[`--l-${k}`] = val))
   v['--r-base'] = radius.base
+  v['--sky-tint-opacity'] = String(sky.tintOpacity)
+  v['--sky-filter'] = sky.filter
   Object.entries(shadow).forEach(([k, val]) => (v[`--e-${k}`] = val))
   v['--m-fast'] = motion.fast
   v['--m-base'] = motion.base

@@ -1,6 +1,7 @@
 // Stellarium Web Engine 연결부. 엔진은 한 번만 띄우고 하늘 화면을 다시 열 때 같은 캔버스를 붙인다.
 // 엔진 원본: https://github.com/Stellarium/stellarium-web-engine (AGPL-3.0)
 import { observer as obsData } from '../data/site.js'
+import { sky as skyTokens } from '../tokens.js'
 
 let enginePromise = null
 let canvasEl = null
@@ -61,6 +62,11 @@ function setupSky(stel) {
   core.observer.elevation = obsData.elevation
   core.observer.utc = stel.date2MJD(obsData.utc)
   core.time_speed = 0
+
+  // 별을 조금 키우고 하늘을 조금 어둡게 한다.
+  core.star_relative_scale = skyTokens.starRelativeScale
+  core.star_linear_scale = skyTokens.starLinearScale
+  core.bortle_index = skyTokens.bortle
 
   // 작품 별 이름과 번호는 화면 위 글자로 따로 그린다. 엔진의 별 이름과 성운, 행성 이름은 끈다.
   core.stars.hints_visible = false

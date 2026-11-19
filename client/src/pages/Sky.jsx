@@ -91,7 +91,7 @@ export default function Sky() {
     firstMoveRef.current = false
     if (work && objsRef.current[work.id]) {
       stel.pointAndLock(objsRef.current[work.id], d)
-      stel.zoomTo(38 * stel.D2R, d)
+      stel.zoomTo(48 * stel.D2R, d)
     } else {
       overview(d)
     }
@@ -177,6 +177,7 @@ export default function Sky() {
   return (
     <div className={`sky${work ? ' has-panel' : ''}`}>
       <div className="sky-host" ref={hostRef} onPointerDown={() => setTouched(true)}>
+        <div className="sky-tint" aria-hidden="true" />
         <svg className="sky-lines" aria-hidden="true">
           {pairs.map(([a, b], i) => (
             <line

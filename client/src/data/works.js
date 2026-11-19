@@ -1,6 +1,6 @@
 import source from './works.source.json'
 
-// 출품작 번호 순서대로 겨울 하늘의 밝은 별 20개에 놓는다.
+// 출품작 19점(9번 없음)을 번호 순서대로 겨울 하늘의 밝은 별에 놓는다.
 // 전시 첫날 밤 한림대학교 하늘에서 지평선 위 12도보다 높고, 서로 7도 넘게 떨어진 밝은 별을 골랐다.
 // 1번 카펠라에서 출발해 페르세우스와 황소, 쌍둥이, 오리온, 큰개자리를 지나 20번 폴룩스까지 한 줄로 잇는다.
 const stars = {
@@ -12,7 +12,6 @@ const stars = {
   '06': { star: '* alf Tau', starName: 'Aldebaran' },
   '07': { star: '* iot Aur', starName: 'iot Aur' },
   '08': { star: '* bet Tau', starName: 'Elnath' },
-  '09': { star: '* zet Tau', starName: 'zet Tau' },
   '10': { star: '* mu. Gem', starName: 'Tejat' },
   '11': { star: '* gam Gem', starName: 'Alhena' },
   '12': { star: '* alf Ori', starName: 'Betelgeuse' },
@@ -28,8 +27,6 @@ const stars = {
 
 // 영상이 함께 들어온 작품
 const motion = new Set(['04', '05', '20'])
-// 파일이 아직 없는 작품은 하늘과 목록에 넣지 않는다
-const missing = new Set(['09'])
 
 // 수상 결과가 나오면 여기만 채운다: 'grand' | 'excellence' | 'encouragement'
 export const awards = {}
@@ -37,7 +34,6 @@ export const awards = {}
 export const awardNames = { grand: '최우수상', excellence: '우수상', encouragement: '장려상' }
 
 export const works = source
-  .filter((w) => !missing.has(w.id))
   .map((w) => ({
     ...w,
     ...stars[w.id],
