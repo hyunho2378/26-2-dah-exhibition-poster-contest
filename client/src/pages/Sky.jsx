@@ -75,9 +75,9 @@ export default function Sky() {
     const small = W < breakpoints.md
     const { dir, fov } = fitView(stel, objs, W, H, {
       top: small ? 96 : 104,
-      bottom: small ? 88 : 96,
+      bottom: small ? 112 : 128,
       left: small ? 28 : 64,
-      right: small ? 56 : 120,
+      right: small ? 76 : 120,
     })
     stel.core.lock = 0
     stel.lookAt(dir, duration)

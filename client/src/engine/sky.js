@@ -125,8 +125,8 @@ export function fitView(stel, objs, W, H, pad) {
   let c = norm(dirs.reduce((a, d) => [a[0] + d[0], a[1] + d[1], a[2] + d[2]], [0, 0, 0]))
   let out = null
   for (let k = 0; k < 3; k++) {
-    const right = norm(cross(c, [0, 0, 1]))
-    const up = cross(right, c)
+    const right = norm(cross([0, 0, 1], c))
+    const up = norm([-c[2] * c[0], -c[2] * c[1], 1 - c[2] * c[2]]) // 천정 방향을 시선에 수직으로 만든 위쪽
     const pts = dirs.map((d) => {
       const f = 2 / (1 + dot(d, c))
       return [dot(d, right) * f, dot(d, up) * f]
