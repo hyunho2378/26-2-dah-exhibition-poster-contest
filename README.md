@@ -19,6 +19,11 @@
 - 색, 글자, 간격, 그림자, 움직임: `client/src/tokens.js` (스타일 파일은 이 값만 쓴다)
 - 하늘 색감과 별 크기: `tokens.js`의 `sky` (엔진 화면에 남보라 색을 입히는 투명도와 필터, 별 크기 배율)
 
+## 배포
+
+- 깃허브 페이지: https://hyunho2378.github.io/26-2-dah-exhibition-poster-contest/
+- `main`에 올리면 `.github/workflows/pages.yml`이 `BASE_PATH=/26-2-dah-exhibition-poster-contest/`로 빌드해 배포한다
+
 ## 실행
 
 ```

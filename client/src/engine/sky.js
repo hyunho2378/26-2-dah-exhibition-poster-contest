@@ -2,6 +2,7 @@
 // 엔진 원본: https://github.com/Stellarium/stellarium-web-engine (AGPL-3.0)
 import { observer as obsData } from '../data/site.js'
 import { sky as skyTokens } from '../tokens.js'
+import { asset } from '../asset.js'
 
 let enginePromise = null
 let canvasEl = null
@@ -31,14 +32,15 @@ export function getCanvas() {
 export function loadEngine() {
   if (enginePromise) return enginePromise
   const canvas = getCanvas()
-  enginePromise = loadScript('/engine/stellarium-web-engine.js').then(
+  enginePromise = loadScript(asset('/engine/stellarium-web-engine.js')).then(
     () =>
       new Promise((resolve) => {
         window.StelWebEngine({
-          wasmFile: '/engine/stellarium-web-engine.wasm',
+          wasmFile: asset('/engine/stellarium-web-engine.wasm'),
           canvas,
           onReady: (stel) => {
             setupSky(stel)
+            stel.paused = true // 하늘 화면에 붙을 때까지 그리지 않는다
             if (import.meta.env.DEV) window.__stel = stel
             resolve(stel)
           },
@@ -50,12 +52,15 @@ export function loadEngine() {
 
 function setupSky(stel) {
   const core = stel.core
-  core.stars.addDataSource({ url: '/skydata/stars' })
-  core.skycultures.addDataSource({ url: '/skydata/skycultures/western', key: 'western' })
-  core.milkyway.addDataSource({ url: '/skydata/surveys/milkyway' })
-  core.landscapes.addDataSource({ url: '/skydata/landscapes/guereins', key: 'guereins' })
-  stel.setFont('regular', '/engine/Roboto-Regular.ttf', 1.38)
-  stel.setFont('bold', '/engine/Roboto-Bold.ttf', 1.38)
+  // 휴대폰은 화면 배율을 1.5로 묶어 그리는 양을 줄인다.
+  const coarse = window.matchMedia('(pointer: coarse)').matches
+  stel.maxDpr = coarse ? 1.5 : 2
+  core.stars.addDataSource({ url: asset('/skydata/stars') })
+  core.skycultures.addDataSource({ url: asset('/skydata/skycultures/western'), key: 'western' })
+  core.milkyway.addDataSource({ url: asset('/skydata/surveys/milkyway') })
+  core.landscapes.addDataSource({ url: asset('/skydata/landscapes/guereins'), key: 'guereins' })
+  stel.setFont('regular', asset('/engine/Roboto-Regular.ttf'), 1.38)
+  stel.setFont('bold', asset('/engine/Roboto-Bold.ttf'), 1.38)
 
   core.observer.latitude = obsData.latitude * stel.D2R
   core.observer.longitude = obsData.longitude * stel.D2R
@@ -67,6 +72,7 @@ function setupSky(stel) {
   core.star_relative_scale = skyTokens.starRelativeScale
   core.star_linear_scale = skyTokens.starLinearScale
   core.bortle_index = skyTokens.bortle
+  core.display_limit_mag = skyTokens.limitMag
 
   // 작품 별 이름과 번호는 화면 위 글자로 따로 그린다. 엔진의 별 이름과 성운, 행성 이름은 끈다.
   core.stars.hints_visible = false

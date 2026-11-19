@@ -197,6 +197,7 @@ export default function Sky() {
               onClick={() => open(w.id)}
               aria-label={`${w.id} ${w.title || ''} ${w.author}`.replace(/\s+/g, ' ').trim()}
             >
+              <span className="star-core" aria-hidden="true" />
               <svg className="star-reticle" viewBox="0 0 40 40" aria-hidden="true">
                 <path d="M4 12V4h8M28 4h8v8M36 28v8h-8M12 36H4v-8" />
               </svg>

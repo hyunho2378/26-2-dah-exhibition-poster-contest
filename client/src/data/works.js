@@ -1,4 +1,5 @@
 import source from './works.source.json'
+import { asset } from '../asset.js'
 
 // 출품작 19점(9번 없음)을 번호 순서대로 겨울 하늘의 밝은 별에 놓는다.
 // 전시 첫날 밤 한림대학교 하늘에서 지평선 위 12도보다 높고, 서로 7도 넘게 떨어진 밝은 별을 골랐다.
@@ -37,9 +38,9 @@ export const works = source
   .map((w) => ({
     ...w,
     ...stars[w.id],
-    thumb: `/works/${w.id}-thumb.jpg`,
-    full: `/works/${w.id}-full.jpg`,
-    motion: motion.has(w.id) ? `/works/${w.id}-motion.mp4` : null,
+    thumb: asset(`/works/${w.id}-thumb.jpg`),
+    full: asset(`/works/${w.id}-full.jpg`),
+    motion: motion.has(w.id) ? asset(`/works/${w.id}-motion.mp4`) : null,
     award: awards[w.id] ?? null,
   }))
 

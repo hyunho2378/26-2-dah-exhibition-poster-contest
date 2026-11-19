@@ -16,15 +16,19 @@ export const colors = {
   textSubHigh: '#e2e3f2',               // 고대비 설정
   scrim: 'rgba(11, 12, 29, 0.72)',
   focus: '#c7b2ff',
-  skyTint: '#3d2b9e',      // 하늘 색을 포스터 남보라로 물들이는 색
+  skyTint: '#4a2bb0',      // 하늘 색을 포스터 남보라로 물들이는 색
+  starCore: '#ffffff',
+  starGlowNear: 'rgba(199, 178, 255, 0.85)',
+  starGlowFar: 'rgba(123, 82, 199, 0.45)',
 }
 
 // 하늘 엔진 화면을 사이트 색에 맞추는 값
 export const sky = {
-  tintOpacity: 0.42,
+  tintOpacity: 0.52,
   filter: 'brightness(0.74) contrast(1.18)',
-  starRelativeScale: 1.22, // 엔진 기본 1.1
-  starLinearScale: 0.9,    // 엔진 기본 0.8
+  starRelativeScale: 1.38, // 엔진 기본 1.1
+  starLinearScale: 1.0,    // 엔진 기본 0.8
+  limitMag: 5.6,           // 이보다 어두운 별은 그리지 않아 작품 별이 잘 보이게 한다
   bortle: 2,               // 하늘 밝기, 엔진 기본 3
 }
 

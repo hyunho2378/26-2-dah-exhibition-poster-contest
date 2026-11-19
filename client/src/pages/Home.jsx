@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { site } from '../data/site.js'
 import { loadEngine } from '../engine/sky.js'
 import Footer from '../components/Footer.jsx'
+import { asset } from '../asset.js'
 
 export default function Home() {
   useEffect(() => {
@@ -15,7 +16,7 @@ export default function Home() {
 
   return (
     <div className="home">
-      <div className="home-sky" aria-hidden="true" />
+      <div className="home-sky" aria-hidden="true" style={{ backgroundImage: `url(${asset('/home-sky.jpg')})` }} />
       <main className="home-main">
         <h1 className="home-title">
           <span data-optical="left">BEYOND</span>
