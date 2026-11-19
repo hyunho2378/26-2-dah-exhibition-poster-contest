@@ -7,7 +7,10 @@ export default function Footer() {
         {site.footer.map((line) => (
           <p key={line} data-optical="left">
             {line.split(/ (?=X )/).map((part, i) => (
-              <span key={part} className="phrase">{i ? ' ' : ''}{part}</span>
+              <span key={part}>
+                {i ? ' ' : null}
+                <span className="phrase">{part}</span>
+              </span>
             ))}
           </p>
         ))}
