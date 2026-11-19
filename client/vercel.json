@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/((?!engine/|skydata/|works/|assets/).*)", "destination": "/index.html" }]
+}
