@@ -6,7 +6,7 @@
 
 ## 화면
 
-한 장짜리 화면이고, 새로고침하면 늘 맨 위에서 시작한다.
+한 장짜리 화면이고, 새로고침하면 늘 맨 위에서 시작한다. 아래로 스크롤하면 홈이 눈앞으로 지나가고 카메라가 하늘 속으로 날아 들어간다.
 
 - 홈: 공모전 이름과 전시 기간, 장소, 시상. 아래로 스크롤하면 하늘로 넘어간다
 - 하늘: 번호가 붙은 별 19개만 빛나고 나머지 별은 어둡게 눌러 두었다. 별을 누르면 하늘이 왼쪽으로 비켜서고 포스터와 작품 글이 나란히 열린다
@@ -23,8 +23,10 @@
 
 ## 배포
 
+- 버셀(대표 주소): https://beyond-the-known-dah.vercel.app/ (팀 dah-committee, 프로젝트 beyond-the-known-dah)
+  - 고쳐서 다시 올릴 때: `cd client && npx vercel deploy --prod --scope dah-committee1`
 - 깃허브 페이지: https://hyunho2378.github.io/26-2-dah-exhibition-poster-contest/
-- `main`에 올리면 `.github/workflows/pages.yml`이 `BASE_PATH=/26-2-dah-exhibition-poster-contest/`로 빌드해 배포한다
+  - `main`에 올리면 `.github/workflows/pages.yml`이 `BASE_PATH=/26-2-dah-exhibition-poster-contest/`로 빌드해 배포한다
 
 ## 실행
 
