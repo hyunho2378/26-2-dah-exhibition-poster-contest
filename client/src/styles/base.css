@@ -288,7 +288,7 @@ p, dd, li { text-wrap: pretty; }
 /* 작품 창이 열려 하늘 칸이 좁아지면 로고가 단추와 부딪히므로 로고를 숨긴다 */
 @container (max-width: 470px) { .sky-logo { display: none; } }
 .sky-logo {
-  font-family: var(--t-nav-font); font-size: 0.9375rem; font-weight: 600; line-height: 1; letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--t-hero-font); font-size: 1.125rem; font-weight: 500; line-height: 1; letter-spacing: 0.04em;
   text-shadow: 0 0 10px var(--c-night);
 }
 

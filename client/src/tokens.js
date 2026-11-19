@@ -49,16 +49,18 @@ export const sky = {
   bortle: 2,               // 하늘 밝기, 엔진 기본 3
 }
 
-// 글꼴은 프리텐다드 하나만 쓴다. 숫자는 tabular-nums로 자리를 맞춘다.
+// 큰 영문 제목과 로고만 Playfair Display, 나머지는 모두 프리텐다드다.
+// 숫자(학번, 별 번호)도 프리텐다드로 쓰고 tabular-nums로 자리를 맞춘다. 점 찍힌 0이 나오는 고정폭 글꼴은 쓰지 않는다.
 export const fonts = {
+  display: "'Playfair Display', 'Pretendard Variable', Pretendard, serif",
   body: "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif",
 }
 
 // 글자 역할마다 크기, 굵기, 행간, 자간을 함께 정한다.
 export const type = {
-  hero:        { size: 'clamp(3rem, 2rem + 5.4vw, 9.5rem)', weight: 600, leading: 0.98, tracking: '-0.04em', font: 'body' },
+  hero:        { size: 'clamp(3.25rem, 2.1rem + 6.2vw, 10.5rem)', weight: 400, leading: 0.92, tracking: '-0.02em', font: 'display' },
   title:       { size: 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)', weight: 500, leading: 1.15, tracking: '-0.015em', font: 'body' },
-  titleEn:     { size: 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)', weight: 500, leading: 1.15, tracking: '-0.025em', font: 'body' },
+  titleEn:     { size: 'clamp(1.5rem, 1.3rem + 1vw, 2.25rem)', weight: 400, leading: 1.1, tracking: '-0.01em', font: 'display' },
   lead:        { size: 'clamp(1.0625rem, 0.98rem + 0.35vw, 1.3125rem)', weight: 500, leading: 1.5, tracking: '-0.005em', font: 'body' },
   body:        { size: 'clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem)', weight: 400, leading: 1.75, tracking: '0em', font: 'body' },
   meta:        { size: 'clamp(0.75rem, 0.72rem + 0.08vw, 1rem)', weight: 400, leading: 1.5, tracking: '0.02em', font: 'body' },
