@@ -18,6 +18,29 @@ function Description({ text }) {
   )
 }
 
+// 공모 요강이 요구하는 "AI 활용 및 학생의 기여" 칸. 원문 "- 항목: 내용" 줄을 항목명과 내용으로 나눠 보여 준다.
+function AiUse({ text }) {
+  const rows = text
+    .split('\n')
+    .map((l) => l.trim().replace(/^-\s*/, ''))
+    .filter(Boolean)
+    .map((l) => {
+      const m = l.match(/^([^:]+):\s*(.*)$/)
+      return m ? { label: m[1].trim(), body: m[2].trim() } : { label: '', body: l }
+    })
+  return (
+    <div className="detail-desc detail-ai">
+      <h3 className="detail-desc-head" data-optical="left">AI 활용 및 학생의 기여</h3>
+      {rows.map((r, i) => (
+        <div key={i} className="detail-ai-row">
+          {r.label ? <p className="detail-desc-sub" data-optical="left">{r.label}</p> : null}
+          <p className="detail-desc-body" data-optical="left">{r.body}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function Media({ work }) {
   const reduce = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const [play, setPlay] = useState(!reduce)
@@ -98,6 +121,7 @@ export default function DetailPanel({ work, onClose }) {
             </p>
             {w.award ? <p className="detail-award" data-optical="left">{awardNames[w.award]}</p> : null}
             {w.description ? <Description text={w.description} /> : null}
+            {w.aiUse ? <AiUse text={w.aiUse} /> : null}
           </div>
         </div>
       </div>

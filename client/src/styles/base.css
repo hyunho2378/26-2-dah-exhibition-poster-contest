@@ -353,6 +353,10 @@ p, dd, li { text-wrap: pretty; }
 .detail-desc > * + .detail-desc-sub { margin-top: var(--s-5); }
 .detail-desc-sub + * { margin-top: var(--s-1); }
 .detail-desc > .detail-desc-head + .detail-desc-sub { margin-top: var(--s-3); }
+.detail-ai { margin-top: var(--s-7); }
+.detail-ai > * + * { margin-top: var(--s-4); }
+.detail-ai > .detail-desc-head + .detail-ai-row { margin-top: var(--s-3); }
+.detail-ai-row > * + * { margin-top: var(--s-1); }
 
 @media (min-width: 768px) {
   .detail { transform: translate3d(100%, 0, 0); }
