@@ -1,7 +1,7 @@
 import { site } from '../data/site.js'
 import { asset } from '../asset.js'
 import { goSky } from '../journey.js'
-import { openAwards } from '../awards.js'
+import { setLit } from '../awards.js'
 
 export function HomePhoto() {
   return (
@@ -16,14 +16,11 @@ export function HomeScrim() {
 }
 
 export default function HomeSection() {
-  const enter = (e) => {
+  // Contents는 작품 전체가 보이는 하늘로, Awards는 수상작만 빛나는 하늘로 들어간다.
+  const enter = (lit) => (e) => {
     e.preventDefault()
+    setLit(lit)
     goSky()
-  }
-
-  const showAwards = (e) => {
-    e.preventDefault()
-    openAwards()
   }
 
   return (
@@ -78,12 +75,12 @@ export default function HomeSection() {
 
         <dl className="home-info home-contents">
           <div className="home-info-col rise" style={{ '--i': 7 }}>
-            <dt data-optical="left">Contents</dt>
+            <dt data-optical="left">작품 보기</dt>
             <dd className="home-links">
-              <a href="#sky" className="home-enter" onClick={enter}>
+              <a href="#sky" className="home-enter" onClick={enter(false)}>
                 {site.enter}
               </a>
-              <a href="#awards" className="home-enter home-enter-sub" onClick={showAwards}>
+              <a href="#awards" className="home-enter" onClick={enter(true)}>
                 {site.awardsLink}
               </a>
             </dd>

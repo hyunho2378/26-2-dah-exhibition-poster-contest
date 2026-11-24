@@ -20,7 +20,7 @@ export const site = {
     '웹사이트 제작/수정 문의: 주현호 (h20222583@glab.hallym.ac.kr)',
   ],
   dahLink: 'https://sites.google.com/glab.hallym.ac.kr/dah-hallym/about?authuser=0',
-  enter: 'Works in the Sky',
+  enter: 'Contents',
   awardsLink: 'Awards',
 }
 

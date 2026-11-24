@@ -58,6 +58,9 @@ p, dd, li { text-wrap: pretty; }
   background: var(--c-night);
 }
 .stage.is-top .sky { visibility: hidden; }
+/* 홈과 하늘 사이는 브라우저 스크롤이 아니라 직접 움직인다. 작품 창이 열리면 창 안 스크롤을 쓴다 */
+.stage { touch-action: none; }
+html.is-locked .stage { touch-action: auto; }
 .stage.is-away .home { visibility: hidden; }
 .stage:not(.is-top) .home { pointer-events: none; }
 .stage:not(.is-arrived) .star, .stage:not(.is-arrived) .sky-header > * { pointer-events: none; }
@@ -178,23 +181,15 @@ p, dd, li { text-wrap: pretty; }
 .home-awards li { display: flex; align-items: baseline; column-gap: var(--s-2); }
 .home-award-count { font-variant-numeric: tabular-nums; }
 .home-contents { grid-row: 5; margin-top: var(--s-5); }
-.home-contents .home-info-col { align-items: center; }
 .home-links { display: flex; flex-wrap: wrap; column-gap: var(--s-3); row-gap: var(--s-3); }
 /* 두 링크는 떠 있는 판으로 둬서 본문 글자와 구분한다. 손을 올리면 한 단계 더 뜬다 */
 .home-enter {
-  position: relative; isolation: isolate; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-5);
-  background: var(--c-nightRaised); border-radius: var(--r-base); box-shadow: var(--e-1);
-  font-family: var(--t-body-font); font-size: var(--t-body-size); font-weight: 600; letter-spacing: 0.01em; line-height: 1;
-  transition: transform var(--m-fast) var(--m-ease);
+  font-family: var(--t-body-font); font-size: var(--t-body-size); font-weight: 600; letter-spacing: 0.01em; line-height: 1.6;
+  color: var(--c-awardText); transition: opacity var(--m-fast) var(--m-ease);
 }
-.home-enter::after {
-  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
-  background: var(--c-nightHigh); box-shadow: var(--e-3); opacity: 0; transition: opacity var(--m-fast) var(--m-ease); pointer-events: none;
-}
-.home-enter:hover::after { opacity: 1; }
-.home-enter:hover { transform: translateY(-1px); }
-.home-enter:active { transform: scale(0.98); }
-.home-enter-sub { color: var(--c-awardText); }
+.home-enter:hover { opacity: 0.75; }
+.home-enter:active { opacity: 0.55; }
+.home-links { column-gap: var(--s-6); }
 /* 낮은 화면과 휴대폰에서는 위아래 간격을 줄여 링크까지 한 화면에 담는다 */
 @media (max-height: 820px), (max-width: 479px) {
   .home-subtitle { margin-top: var(--s-5); }
@@ -324,13 +319,19 @@ p, dd, li { text-wrap: pretty; }
 /* 작품 창이 열려 하늘 칸이 좁아지면 로고가 단추와 부딪히므로 로고를 숨긴다 */
 @container (max-width: 470px) { .sky.has-detail .sky-nav { display: none; } }
 .sky-nav { display: flex; flex-direction: column; align-items: flex-start; row-gap: var(--s-3); padding-top: calc((var(--band) - env(safe-area-inset-top)) / 2 - 0.5625rem); align-self: flex-start; }
-.sky-awards {
+.sky-views { display: flex; column-gap: var(--s-5); }
+.sky-view {
   font-family: var(--t-hero-font); font-size: 1rem; font-weight: 500; line-height: 1; letter-spacing: 0.04em;
-  color: var(--c-textMute); text-shadow: 0 0 10px var(--c-night);
-  transition: color var(--m-base) var(--m-ease), opacity var(--m-fast) var(--m-ease);
+  color: var(--c-awardText); opacity: 0.5; text-shadow: 0 0 10px var(--c-night);
+  transition: opacity var(--m-base) var(--m-ease);
 }
-.sky-awards:hover { opacity: 0.78; }
-.sky-awards[aria-pressed='true'] { color: var(--c-awardText); }
+.sky-view:hover { opacity: 0.8; }
+.sky-view[aria-pressed='true'] { opacity: 1; }
+.sky-more {
+  font-size: var(--t-meta-size); line-height: 1.2; letter-spacing: 0.02em; color: var(--c-textSub);
+  text-shadow: 0 0 10px var(--c-night); transition: opacity var(--m-fast) var(--m-ease);
+}
+.sky-more:hover { opacity: 0.75; }
 .sky-logo {
   font-family: var(--t-hero-font); font-size: 1.125rem; font-weight: 500; line-height: 1; letter-spacing: 0.04em;
   text-shadow: 0 0 10px var(--c-night);

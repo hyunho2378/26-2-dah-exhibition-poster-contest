@@ -4,7 +4,7 @@ import { site } from '../data/site.js'
 import { motion as motionTokens, breakpoints } from '../tokens.js'
 import { asset } from '../asset.js'
 import { goHome } from '../journey.js'
-import { useAwardsOpen } from '../awards.js'
+import { openAwards, useAwardsOpen, useLit, setLit } from '../awards.js'
 import { runMeteors } from '../fx/meteor.js'
 import { getCanvas, loadEngine, projectObj, fitView } from '../engine/sky.js'
 import DetailPanel from './DetailPanel.jsx'
@@ -24,7 +24,7 @@ export default function SkySection({ progressRef, apiRef }) {
   const work = workId ? getWork(workId) : null
   const awardsOn = useAwardsOpen()
   const awardsOnRef = useRef(false)
-  const [lit, setLit] = useState(false) // 수상작만 빛을 켜는 보기
+  const lit = useLit() // false는 Contents(전체), true는 Awards(수상작만 빛남)
   const litRef = useRef(false)
 
   const skyRef = useRef(null)
@@ -52,7 +52,9 @@ export default function SkySection({ progressRef, apiRef }) {
     host.prepend(canvas)
     let alive = true
     let tries = 0
-    const start = window.setTimeout(() => {
+    let attempt = 0
+    let retry = 0
+    const begin = () => {
       loadEngine().then((stel) => {
         if (!alive) return
         stelRef.current = stel
@@ -75,15 +77,22 @@ export default function SkySection({ progressRef, apiRef }) {
         }
         find()
       }).catch(() => {
-        // 엔진을 못 불러와도 여정이 하늘 앞에서 갇히지 않게 준비된 것으로 본다.
         if (!alive) return
+        attempt += 1
+        if (attempt < 4) {
+          retry = window.setTimeout(begin, 1500 * attempt) // 네트워크가 흔들렸을 수 있어 몇 번 더 받아 본다
+          return
+        }
+        // 끝내 못 불러와도 여정이 하늘 앞에서 갇히지 않게 준비된 것으로 본다.
         readyRef.current = true
         setReady(true)
       })
-    }, 120)
+    }
+    const start = window.setTimeout(begin, 120)
     return () => {
       alive = false
       window.clearTimeout(start)
+      window.clearTimeout(retry)
       canvas.remove()
     }
   }, [])
@@ -306,17 +315,25 @@ export default function SkySection({ progressRef, apiRef }) {
     btn.appendChild(svg)
   }
 
-  // 수상작 보기: 켜면 수상작 별만 밝아지고 나머지는 어두워진다. 켜는 순간 수상작 별에서 빛의 파문이 차례로 퍼진다.
-  const toggleLit = useCallback(() => {
-    const next = !litRef.current
-    litRef.current = next
-    setLit(next)
-    if (next) {
+  // Awards를 켜면 수상작 별에서 빛의 파문이 차례로 퍼진다. 하늘에 도착하기 전이면 도착을 기다렸다가 퍼진다.
+  useEffect(() => {
+    litRef.current = lit
+    if (!lit) return undefined
+    let timers = []
+    let waited = 0
+    const go = () => {
+      if (progressRef.current < 0.985 && waited < 8000) {
+        waited += 100
+        timers.push(window.setTimeout(go, 100))
+        return
+      }
       works
         .filter((w) => w.award)
-        .forEach((w, i) => window.setTimeout(() => ripple(markerRefs.current[w.id]), 120 + i * 140))
+        .forEach((w, i) => timers.push(window.setTimeout(() => ripple(markerRefs.current[w.id]), 200 + i * 140)))
     }
-  }, [])
+    go()
+    return () => timers.forEach((t) => window.clearTimeout(t))
+  }, [lit, progressRef])
 
   // 작품 창은 주소를 바꾸지 않는다. 뒤로 가기는 창 닫기로 쓴다.
   const open = useCallback((id, opener) => {
@@ -356,7 +373,7 @@ export default function SkySection({ progressRef, apiRef }) {
       if (document.documentElement.classList.contains('is-awards')) return // 수상 페이지가 열려 있으면 그쪽이 키를 쓴다
       if (e.key === 'Escape') {
         if (workIdRef.current) close()
-        else if (litRef.current) toggleLit()
+        else if (litRef.current) setLit(false)
         return
       }
       if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return
@@ -373,7 +390,7 @@ export default function SkySection({ progressRef, apiRef }) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [close, open, progressRef, toggleLit])
+  }, [close, open, progressRef])
 
   // 작품 창이 열려 있는 동안에는 페이지가 스크롤되지 않는다.
   useEffect(() => {
@@ -457,9 +474,19 @@ export default function SkySection({ progressRef, apiRef }) {
       <header className="sky-header" ref={headerRef}>
         <div className="sky-nav">
           <a href="#home" className="sky-logo" data-optical="left" onClick={back}>{site.title}</a>
-          <button type="button" className="sky-awards" data-optical="left" aria-pressed={lit} onClick={toggleLit}>
-            {site.awardsLink}
-          </button>
+          <div className="sky-views" role="group" aria-label="보기">
+            <button type="button" className="sky-view" data-optical="left" aria-pressed={!lit} onClick={() => setLit(false)}>
+              Contents
+            </button>
+            <button type="button" className="sky-view" aria-pressed={lit} onClick={() => setLit(true)}>
+              Awards
+            </button>
+          </div>
+          {lit ? (
+            <a href="#awards" className="sky-more" data-optical="left" onClick={(e) => { e.preventDefault(); openAwards() }}>
+              수상작 자세히 보기
+            </a>
+          ) : null}
         </div>
       </header>
 

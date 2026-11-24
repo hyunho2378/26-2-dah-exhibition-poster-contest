@@ -10,7 +10,7 @@ const PRE = 0.1 // 하늘을 기다리는 동안 머무는 진행도
 const WAIT_MAX = 12000 // 하늘을 기다리는 가장 긴 시간(ms)
 const COOL = 350 // 이동이 끝난 뒤 관성 입력을 무시하는 시간(ms)
 
-const st = { flying: false, token: 0, intent: 0, cool: 0, lastY: 0, dir: 1, settle: 0, isReady: () => true }
+const st = { flying: false, waiting: false, sky: false, token: 0, intent: 0, cool: 0, lastY: 0, dir: 1, settle: 0, isReady: () => true }
 
 export function travelPx() {
   const j = document.querySelector('.journey')
@@ -57,7 +57,9 @@ async function run(target, mine) {
   if (target === 1 && !st.isReady()) {
     await tween(PRE * travel, 900)
     const t0 = performance.now()
+    st.waiting = true
     while (!st.isReady() && performance.now() - t0 < WAIT_MAX && mine === st.intent) await sleep(100)
+    st.waiting = false
     if (mine !== st.intent) return
   }
   const to = target * travel
@@ -84,7 +86,7 @@ export function initJourney({ isReady }) {
   const onWheel = (e) => {
     if (e.ctrlKey || overlayOpen()) return
     const dy = e.deltaY
-    if (Math.abs(dy) < 4 || Math.abs(dy) < Math.abs(e.deltaX)) return
+    if (Math.abs(dy) < 1 || Math.abs(dy) < Math.abs(e.deltaX)) return
     if (busy()) {
       e.preventDefault()
       return
@@ -127,7 +129,7 @@ export function initJourney({ isReady }) {
     const y = window.scrollY
     const travel = travelPx()
     // 손가락을 위로 밀면(dy > 0) 하늘로, 아래로 밀면 홈으로. 하늘에서 별을 누르다 살짝 밀린 정도로는 돌아가지 않는다.
-    if (dy > 10 && y < travel - EDGE) {
+    if (dy > 4 && y < travel - EDGE) {
       if (e.cancelable) e.preventDefault()
       handled = true
       fly(1)
@@ -159,6 +161,9 @@ export function initJourney({ isReady }) {
   // 스크롤바를 끌거나 다른 방법으로 중간에 멈추면, 마지막으로 움직인 방향대로 마저 간다.
   const onScroll = () => {
     const y = window.scrollY
+    const t = travelPx()
+    if (y >= t - EDGE) st.sky = true
+    else if (y <= EDGE) st.sky = false
     if (y !== st.lastY) st.dir = y > st.lastY ? 1 : -1
     st.lastY = y
     if (st.flying) return
@@ -170,6 +175,27 @@ export function initJourney({ isReady }) {
     }, 160)
   }
 
+  // 화면 크기나 방향이 바뀌어 여정 길이가 달라지면, 하늘에 있던 사람은 새 길이의 끝에 다시 놓는다.
+  const onResize = () => {
+    window.setTimeout(() => {
+      if (st.sky && !st.flying && !overlayOpen()) window.scrollTo(0, travelPx())
+    }, 120)
+  }
+
+  // 안전장치: 어떤 이유로든 중간에서 멈춰 있으면(하늘을 기다리는 중과 이동 중은 제외) 가던 방향으로 마저 보낸다.
+  let seenY = -1
+  const watchdog = window.setInterval(() => {
+    if (st.flying || st.waiting || overlayOpen() || document.hidden) {
+      seenY = -1
+      return
+    }
+    const y = window.scrollY
+    const mid = y >= EDGE && y <= travelPx() - EDGE
+    if (mid && Math.abs(y - seenY) < 1) fly(st.dir)
+    seenY = mid ? y : -1
+  }, 700)
+
+  window.addEventListener('resize', onResize)
   window.addEventListener('wheel', onWheel, { passive: false })
   window.addEventListener('touchstart', onTouchStart, { passive: true })
   window.addEventListener('touchmove', onTouchMove, { passive: false })
@@ -181,6 +207,8 @@ export function initJourney({ isReady }) {
     window.removeEventListener('touchmove', onTouchMove)
     window.removeEventListener('keydown', onKey)
     window.removeEventListener('scroll', onScroll)
+    window.removeEventListener('resize', onResize)
+    window.clearInterval(watchdog)
     window.clearTimeout(st.settle)
     html().classList.remove('is-flying')
   }

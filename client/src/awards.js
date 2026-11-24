@@ -44,3 +44,18 @@ const subscribe = (f) => {
 }
 
 export const useAwardsOpen = () => useSyncExternalStore(subscribe, isAwardsOpen, () => false)
+
+// 하늘의 보기 상태: false는 Contents(전체), true는 Awards(수상작만 빛남). 홈에서 고른 보기가 하늘에 그대로 이어진다.
+let lit = false
+const litSubs = new Set()
+export const isLit = () => lit
+export function setLit(v) {
+  if (lit === v) return
+  lit = v
+  litSubs.forEach((f) => f())
+}
+const subscribeLit = (f) => {
+  litSubs.add(f)
+  return () => litSubs.delete(f)
+}
+export const useLit = () => useSyncExternalStore(subscribeLit, isLit, () => false)

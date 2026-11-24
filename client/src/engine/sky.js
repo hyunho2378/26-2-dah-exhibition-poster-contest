@@ -32,6 +32,11 @@ export function getCanvas() {
 export function loadEngine() {
   if (enginePromise) return enginePromise
   const canvas = getCanvas()
+  // 휴대폰에서 그래픽 자원을 뺏기면 하늘이 비므로, 그럴 때는 페이지를 다시 불러 하늘을 되살린다.
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault()
+    window.setTimeout(() => window.location.reload(), 1500)
+  })
   enginePromise = loadScript(asset('/engine/stellarium-web-engine.js')).then(
     () =>
       new Promise((resolve) => {
@@ -47,6 +52,10 @@ export function loadEngine() {
         })
       }),
   )
+  enginePromise.catch(() => {
+    enginePromise = null // 다음 시도에서 다시 받는다
+    document.querySelectorAll('script[src*="stellarium-web-engine"]').forEach((el) => el.remove())
+  })
   return enginePromise
 }
 
