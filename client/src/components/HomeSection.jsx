@@ -38,16 +38,34 @@ export default function HomeSection() {
           <span className="phrase">프로젝트 전시회 포스터 공모전</span>
         </p>
 
-        <dl className="home-info">
+        <dl className="home-info home-about">
           <div className="home-info-col rise" style={{ '--i': 3 }}>
+            <dt data-optical="left">뜻</dt>
+            <dd data-optical="left">{site.meaning}</dd>
+          </div>
+          <div className="home-info-col rise" style={{ '--i': 4 }}>
+            <dt data-optical="left">주제</dt>
+            <dd className="home-theme" data-optical="left">
+              {site.themeLines.map((t, i) => (
+                <span key={i}>
+                  {i > 0 ? ' ' : null}
+                  <span className="phrase">{t}</span>
+                </span>
+              ))}
+            </dd>
+          </div>
+        </dl>
+
+        <dl className="home-info">
+          <div className="home-info-col rise" style={{ '--i': 5 }}>
             <dt data-optical="left">전시 기간</dt>
             <dd data-optical="left">{site.period}</dd>
           </div>
-          <div className="home-info-col rise" style={{ '--i': 4 }}>
+          <div className="home-info-col rise" style={{ '--i': 6 }}>
             <dt data-optical="left">전시 장소</dt>
             <dd data-optical="left">{site.venue}</dd>
           </div>
-          <div className="home-info-col rise" style={{ '--i': 5 }}>
+          <div className="home-info-col rise" style={{ '--i': 7 }}>
             <dt data-optical="left">시상</dt>
             <dd>
               <ul className="home-awards">
@@ -55,8 +73,6 @@ export default function HomeSection() {
                   <li key={a.name}>
                     <span className="home-award-name" data-optical="left">{a.name}</span>
                     <span className="home-award-count">{a.count}</span>
-                    <span className="home-award-prize">{a.prize}</span>
-                    {a.note ? <span className="home-award-note">{a.note}</span> : null}
                   </li>
                 ))}
               </ul>
@@ -64,7 +80,7 @@ export default function HomeSection() {
           </div>
         </dl>
 
-        <div className="home-links rise" style={{ '--i': 6 }}>
+        <div className="home-links rise" style={{ '--i': 8 }}>
           <a href="#sky" className="home-enter" onClick={enter} data-optical="left">
             {site.enter}
           </a>

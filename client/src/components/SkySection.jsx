@@ -4,7 +4,7 @@ import { site } from '../data/site.js'
 import { motion as motionTokens, breakpoints } from '../tokens.js'
 import { asset } from '../asset.js'
 import { goHome } from '../journey.js'
-import { openAwards, useAwardsOpen } from '../awards.js'
+import { useAwardsOpen } from '../awards.js'
 import { runMeteors } from '../fx/meteor.js'
 import { getCanvas, loadEngine, projectObj, fitView } from '../engine/sky.js'
 import DetailPanel from './DetailPanel.jsx'
@@ -24,6 +24,8 @@ export default function SkySection({ progressRef, apiRef }) {
   const work = workId ? getWork(workId) : null
   const awardsOn = useAwardsOpen()
   const awardsOnRef = useRef(false)
+  const [lit, setLit] = useState(false) // 수상작만 빛을 켜는 보기
+  const litRef = useRef(false)
 
   const skyRef = useRef(null)
   const hostRef = useRef(null)
@@ -72,8 +74,13 @@ export default function SkySection({ progressRef, apiRef }) {
           } else window.setTimeout(find, 200)
         }
         find()
+      }).catch(() => {
+        // 엔진을 못 불러와도 여정이 하늘 앞에서 갇히지 않게 준비된 것으로 본다.
+        if (!alive) return
+        readyRef.current = true
+        setReady(true)
       })
-    }, 500)
+    }, 120)
     return () => {
       alive = false
       window.clearTimeout(start)
@@ -149,7 +156,7 @@ export default function SkySection({ progressRef, apiRef }) {
     [computeFit],
   )
 
-  useImperativeHandle(apiRef, () => ({ applyProgress }), [applyProgress])
+  useImperativeHandle(apiRef, () => ({ applyProgress, isReady: () => readyRef.current }), [applyProgress])
 
   // 엔진이 준비되면 지금 진행도에 맞춰 한 번 맞춘다.
   useEffect(() => {
@@ -299,6 +306,18 @@ export default function SkySection({ progressRef, apiRef }) {
     btn.appendChild(svg)
   }
 
+  // 수상작 보기: 켜면 수상작 별만 밝아지고 나머지는 어두워진다. 켜는 순간 수상작 별에서 빛의 파문이 차례로 퍼진다.
+  const toggleLit = useCallback(() => {
+    const next = !litRef.current
+    litRef.current = next
+    setLit(next)
+    if (next) {
+      works
+        .filter((w) => w.award)
+        .forEach((w, i) => window.setTimeout(() => ripple(markerRefs.current[w.id]), 120 + i * 140))
+    }
+  }, [])
+
   // 작품 창은 주소를 바꾸지 않는다. 뒤로 가기는 창 닫기로 쓴다.
   const open = useCallback((id, opener) => {
     openerRef.current = opener || null
@@ -337,6 +356,7 @@ export default function SkySection({ progressRef, apiRef }) {
       if (document.documentElement.classList.contains('is-awards')) return // 수상 페이지가 열려 있으면 그쪽이 키를 쓴다
       if (e.key === 'Escape') {
         if (workIdRef.current) close()
+        else if (litRef.current) toggleLit()
         return
       }
       if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return
@@ -346,13 +366,14 @@ export default function SkySection({ progressRef, apiRef }) {
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
       e.preventDefault()
       const dir = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1
-      const ids = works.map((w) => w.id)
-      const cur = workIdRef.current ? ids.indexOf(workIdRef.current) : dir > 0 ? -1 : 0
+      const ids = (litRef.current ? works.filter((w) => w.award) : works).map((w) => w.id)
+      let cur = workIdRef.current ? ids.indexOf(workIdRef.current) : -1
+      if (cur < 0) cur = dir > 0 ? -1 : 0
       open(ids[(cur + dir + ids.length) % ids.length], null)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [close, open, progressRef])
+  }, [close, open, progressRef, toggleLit])
 
   // 작품 창이 열려 있는 동안에는 페이지가 스크롤되지 않는다.
   useEffect(() => {
@@ -373,11 +394,6 @@ export default function SkySection({ progressRef, apiRef }) {
     goHome()
   }
 
-  const showAwards = (e) => {
-    e.preventDefault()
-    openAwards()
-  }
-
   // 수상 페이지가 덮고 있는 동안에는 하늘 그리기를 멈춘다.
   useEffect(() => {
     awardsOnRef.current = awardsOn
@@ -386,10 +402,11 @@ export default function SkySection({ progressRef, apiRef }) {
   }, [awardsOn])
 
   return (
-    <div id="sky" ref={skyRef} className={`sky${work ? ' has-detail' : ''}${visible ? ' is-visible' : ''}${light ? ' has-light' : ''}`}>
+    <div id="sky" ref={skyRef} className={`sky${work ? ' has-detail' : ''}${visible ? ' is-visible' : ''}${light ? ' has-light' : ''}${lit ? ' show-awards' : ''}`}>
       <div className="sky-host" ref={hostRef} style={{ backgroundImage: `url(${asset('/home-sky.jpg')})` }}>
         <div className="sky-tint" aria-hidden="true" />
         <div className="sky-dim" aria-hidden="true" />
+        <div className="sky-veil" aria-hidden="true" />
         <div className="meteors" ref={meteorsRef} aria-hidden="true" />
         <svg className="sky-lines" aria-hidden="true">
           {pairs.map(([a, b], i) => (
@@ -407,7 +424,8 @@ export default function SkySection({ progressRef, apiRef }) {
               key={w.id}
               type="button"
               ref={(el) => (markerRefs.current[w.id] = el)}
-              className={`star${workId === w.id ? ' is-active' : ''}`}
+              className={`star${workId === w.id ? ' is-active' : ''}${w.award ? ' is-award' : ''}`}
+              data-award={w.award || undefined}
               style={{ '--i': i }}
               onPointerEnter={() => setHoverId(w.id)}
               onPointerLeave={() => setHoverId(null)}
@@ -437,8 +455,12 @@ export default function SkySection({ progressRef, apiRef }) {
       </div>
 
       <header className="sky-header" ref={headerRef}>
-        <a href="#home" className="sky-logo" data-optical="left" onClick={back}>{site.title}</a>
-        <a href="#awards" className="sky-link" data-optical="right" onClick={showAwards}>{site.awardsLink}</a>
+        <div className="sky-nav">
+          <a href="#home" className="sky-logo" data-optical="left" onClick={back}>{site.title}</a>
+          <button type="button" className="sky-awards" data-optical="left" aria-pressed={lit} onClick={toggleLit}>
+            {site.awardsLink}
+          </button>
+        </div>
       </header>
 
       <DetailPanel work={work} onClose={close} />

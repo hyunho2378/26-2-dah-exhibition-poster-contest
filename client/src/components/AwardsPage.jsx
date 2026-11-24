@@ -109,8 +109,6 @@ export default function AwardsPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open, flat, openWork, closeWork])
 
-  const prize = (name) => site.awards.find((a) => a.name === name)?.prize
-
   return (
     <section ref={rootRef} className={`awards${open ? ' is-open' : ''}${work ? ' has-detail' : ''}`} aria-label="수상작" aria-hidden={!open}>
       <div className="awards-scroll" ref={scrollRef}>
@@ -135,7 +133,6 @@ export default function AwardsPage() {
                 <div key={g.key} className={`award-group is-${g.key}${open ? ' rise' : ''}`} style={{ '--i': gi + 2 }}>
                   <div className="award-label">
                     <h2 className="award-name" data-optical="left">{g.name}</h2>
-                    <p className="award-prize" data-optical="left">{prize(g.name)}</p>
                   </div>
                   <ul className="award-list">
                     {g.works.map((w) => (

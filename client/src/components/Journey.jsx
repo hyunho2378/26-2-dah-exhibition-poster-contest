@@ -3,6 +3,7 @@ import HomeSection, { HomePhoto, HomeScrim } from './HomeSection.jsx'
 import Cosmos from './Cosmos.jsx'
 import SkySection from './SkySection.jsx'
 import { sky as skyTokens } from '../tokens.js'
+import { initJourney } from '../journey.js'
 
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x))
 const smooth = (a, b, x) => {
@@ -17,6 +18,9 @@ export default function Journey() {
   const stageRef = useRef(null)
   const progressRef = useRef(0)
   const skyApi = useRef(null)
+
+  // 홈에서 한 번 밀면 하늘까지 날아간다. 하늘이 준비되기 전에는 별이 흐르기 시작한 채로 기다린다.
+  useEffect(() => initJourney({ isReady: () => Boolean(skyApi.current?.isReady?.()) }), [])
 
   useEffect(() => {
     const journey = journeyRef.current
@@ -71,8 +75,6 @@ export default function Journey() {
         <HomeScrim />
         <HomeSection />
       </div>
-      <span className="snap snap-top" aria-hidden="true" />
-      <span className="snap snap-sky" aria-hidden="true" />
     </main>
   )
 }

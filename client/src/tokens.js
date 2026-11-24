@@ -21,6 +21,11 @@ export const colors = {
   starCore: '#ffffff',
   starGlowNear: 'rgba(199, 178, 255, 0.85)',
   starGlowFar: 'rgba(123, 82, 199, 0.5)',
+  // 수상작 별: 보랏빛 별 사이에서 한눈에 띄도록 따뜻한 금빛으로 둔다
+  awardCore: '#ffd36b',
+  awardGlowNear: 'rgba(255, 211, 107, 0.92)',
+  awardGlowFar: 'rgba(255, 150, 40, 0.6)',
+  awardText: '#ffd98a',
   meteorHead: 'rgba(255, 255, 255, 0.95)',
   meteorTail: 'rgba(255, 255, 255, 0)',
   maskLight: 'rgba(0, 0, 0, 0.38)', // 커서 둘레에서 어둠이 걷히는 정도
