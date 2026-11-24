@@ -1,6 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { applyOptical } from './optical.js'
 import Journey from './components/Journey.jsx'
+import AwardsPage from './components/AwardsPage.jsx'
+import { useAwardsOpen } from './awards.js'
 
 // 화면이 바뀌거나 폭이 바뀔 때마다 글자 윤곽 정렬을 다시 잰다.
 function useOpticalAlign() {
@@ -25,9 +27,18 @@ function useOpticalAlign() {
 
 export default function App() {
   useOpticalAlign()
+  const awardsOn = useAwardsOpen()
+  const bodyRef = useRef(null)
+  // 수상 페이지가 덮고 있는 동안 뒤쪽 화면에는 초점이 가지 않는다.
+  useEffect(() => {
+    bodyRef.current?.toggleAttribute('inert', awardsOn)
+  }, [awardsOn])
   return (
     <>
-      <Journey />
+      <div ref={bodyRef}>
+        <Journey />
+      </div>
+      <AwardsPage />
     </>
   )
 }

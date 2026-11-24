@@ -20,6 +20,7 @@ export const site = {
   ],
   dahLink: 'https://sites.google.com/glab.hallym.ac.kr/dah-hallym/about?authuser=0',
   enter: 'Works in the Sky',
+  awardsLink: 'Awards',
 }
 
 // 하늘을 보는 자리와 시각: 한림대학교, 전시 첫날 밤 11시 30분

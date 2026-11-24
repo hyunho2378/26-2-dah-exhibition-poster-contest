@@ -4,6 +4,7 @@ import { site } from '../data/site.js'
 import { motion as motionTokens, breakpoints } from '../tokens.js'
 import { asset } from '../asset.js'
 import { goHome } from '../journey.js'
+import { openAwards, useAwardsOpen } from '../awards.js'
 import { runMeteors } from '../fx/meteor.js'
 import { getCanvas, loadEngine, projectObj, fitView } from '../engine/sky.js'
 import DetailPanel from './DetailPanel.jsx'
@@ -21,6 +22,8 @@ export default function SkySection({ progressRef, apiRef }) {
   const [hoverId, setHoverId] = useState(null)
   const [light, setLight] = useState(false)
   const work = workId ? getWork(workId) : null
+  const awardsOn = useAwardsOpen()
+  const awardsOnRef = useRef(false)
 
   const skyRef = useRef(null)
   const hostRef = useRef(null)
@@ -51,7 +54,7 @@ export default function SkySection({ progressRef, apiRef }) {
       loadEngine().then((stel) => {
         if (!alive) return
         stelRef.current = stel
-        stel.paused = !visibleRef.current
+        stel.paused = !visibleRef.current || awardsOnRef.current
         const find = () => {
           if (!alive) return
           let missing = 0
@@ -121,7 +124,7 @@ export default function SkySection({ progressRef, apiRef }) {
       if (visibleRef.current !== on) {
         visibleRef.current = on
         setVisible(on)
-        if (stelRef.current) stelRef.current.paused = !on
+        if (stelRef.current) stelRef.current.paused = !on || awardsOnRef.current
       }
       const stel = stelRef.current
       const f = computeFit()
@@ -331,6 +334,7 @@ export default function SkySection({ progressRef, apiRef }) {
   // 키보드: 방향키(위아래, 양옆)로 이전과 다음 작품, Esc로 닫기
   useEffect(() => {
     const onKey = (e) => {
+      if (document.documentElement.classList.contains('is-awards')) return // 수상 페이지가 열려 있으면 그쪽이 키를 쓴다
       if (e.key === 'Escape') {
         if (workIdRef.current) close()
         return
@@ -368,6 +372,18 @@ export default function SkySection({ progressRef, apiRef }) {
     e.preventDefault()
     goHome()
   }
+
+  const showAwards = (e) => {
+    e.preventDefault()
+    openAwards()
+  }
+
+  // 수상 페이지가 덮고 있는 동안에는 하늘 그리기를 멈춘다.
+  useEffect(() => {
+    awardsOnRef.current = awardsOn
+    const stel = stelRef.current
+    if (stel) stel.paused = awardsOn || !visibleRef.current
+  }, [awardsOn])
 
   return (
     <div id="sky" ref={skyRef} className={`sky${work ? ' has-detail' : ''}${visible ? ' is-visible' : ''}${light ? ' has-light' : ''}`}>
@@ -422,6 +438,7 @@ export default function SkySection({ progressRef, apiRef }) {
 
       <header className="sky-header" ref={headerRef}>
         <a href="#home" className="sky-logo" data-optical="left" onClick={back}>{site.title}</a>
+        <a href="#awards" className="sky-link" data-optical="right" onClick={showAwards}>{site.awardsLink}</a>
       </header>
 
       <DetailPanel work={work} onClose={close} />

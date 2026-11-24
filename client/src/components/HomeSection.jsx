@@ -1,6 +1,7 @@
 import { site } from '../data/site.js'
 import { asset } from '../asset.js'
 import { goSky } from '../journey.js'
+import { openAwards } from '../awards.js'
 
 export function HomePhoto() {
   return (
@@ -18,6 +19,11 @@ export default function HomeSection() {
   const enter = (e) => {
     e.preventDefault()
     goSky()
+  }
+
+  const showAwards = (e) => {
+    e.preventDefault()
+    openAwards()
   }
 
   return (
@@ -58,9 +64,14 @@ export default function HomeSection() {
           </div>
         </dl>
 
-        <a href="#sky" className="home-enter rise" style={{ '--i': 6 }} onClick={enter} data-optical="left">
-          {site.enter}
-        </a>
+        <div className="home-links rise" style={{ '--i': 6 }}>
+          <a href="#sky" className="home-enter" onClick={enter} data-optical="left">
+            {site.enter}
+          </a>
+          <a href="#awards" className="home-enter home-enter-sub" onClick={showAwards}>
+            {site.awardsLink}
+          </a>
+        </div>
       </div>
     </div>
   )

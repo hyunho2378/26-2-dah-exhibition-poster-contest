@@ -85,6 +85,9 @@ export const layout = {
   detailPadB: 'clamp(24px, 4svh, 48px)',   // 포스터 아래 여백
   posterRatio: '1.4142',                   // A2 세로
   textW: 'clamp(300px, 24vw, 720px)',      // 작품 글 칸
+  awardLabelW: 'clamp(6.5rem, 11vw, 10rem)',  // 수상 페이지 등급 이름 칸
+  awardGap: 'clamp(20px, 2.8vw, 48px)',       // 수상 페이지 포스터 사이
+  awardGrandW: 'min(46%, 460px)',             // 최우수상 포스터 폭
 }
 
 export const radius = { base: '6px' }
@@ -105,7 +108,7 @@ export const motion = {
   skyFit: 0.7, // 작품 창이 열고 닫힐 때 하늘이 자리를 옮기는 시간(초)
 }
 
-export const z = { sky: 0, overlay: 10, header: 20, panel: 30, index: 40 }
+export const z = { sky: 0, overlay: 10, header: 20, panel: 30, index: 40, awards: 50 }
 
 export const breakpoints = { md: 768, xl: 1280 }
 

@@ -50,6 +50,11 @@ export const works = source
     award: awards[w.id] ?? null,
   }))
 
+// 수상 페이지에 쓰는 묶음: 최우수상, 우수상, 장려상 순서로 작품 번호 순
+export const awardGroups = ['grand', 'excellence', 'encouragement']
+  .map((key) => ({ key, name: awardNames[key], works: works.filter((w) => w.award === key) }))
+  .filter((g) => g.works.length)
+
 export function getWork(id) {
   return works.find((w) => w.id === id) ?? null
 }
