@@ -30,8 +30,14 @@ const stars = {
 // 영상이 함께 들어온 작품
 const motion = new Set(['04', '05', '20'])
 
-// 수상 결과가 나오면 여기만 채운다: 'grand' | 'excellence' | 'encouragement'
-export const awards = {}
+// 수상작: 'grand' 최우수상 | 'excellence' 우수상 | 'encouragement' 장려상
+export const awards = {
+  '17': 'grand',
+  '02': 'excellence',
+  '03': 'excellence',
+  '05': 'excellence',
+  '07': 'encouragement',
+}
 
 export const awardNames = { grand: '최우수상', excellence: '우수상', encouragement: '장려상' }
 
