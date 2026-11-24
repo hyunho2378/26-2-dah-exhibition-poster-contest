@@ -7,7 +7,6 @@ export const site = {
   period: '2026. 11. 23. (월) ~ 12. 4. (금)',
   venue: '한림대학교 4층 C.Square',
   // 첫 화면에 보이는 제목의 뜻과 공모 주제
-  meaning: '알던 세계 너머',
   themeLines: ['지역의 고유한 이야기와', '세계의 다양한 시선이 이루는 글로컬,', '별자리를 시각화로 표현'],
   awards: [
     { name: '최우수상', count: '1점' },

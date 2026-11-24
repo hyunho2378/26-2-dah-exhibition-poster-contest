@@ -40,10 +40,6 @@ export default function HomeSection() {
 
         <dl className="home-info home-about">
           <div className="home-info-col rise" style={{ '--i': 3 }}>
-            <dt data-optical="left">뜻</dt>
-            <dd data-optical="left">{site.meaning}</dd>
-          </div>
-          <div className="home-info-col rise" style={{ '--i': 4 }}>
             <dt data-optical="left">주제</dt>
             <dd className="home-theme" data-optical="left">
               {site.themeLines.map((t, i) => (
@@ -56,16 +52,16 @@ export default function HomeSection() {
           </div>
         </dl>
 
-        <dl className="home-info">
-          <div className="home-info-col rise" style={{ '--i': 5 }}>
+        <dl className="home-info home-facts">
+          <div className="home-info-col rise" style={{ '--i': 4 }}>
             <dt data-optical="left">전시 기간</dt>
             <dd data-optical="left">{site.period}</dd>
           </div>
-          <div className="home-info-col rise" style={{ '--i': 6 }}>
+          <div className="home-info-col rise" style={{ '--i': 5 }}>
             <dt data-optical="left">전시 장소</dt>
             <dd data-optical="left">{site.venue}</dd>
           </div>
-          <div className="home-info-col rise" style={{ '--i': 7 }}>
+          <div className="home-info-col rise" style={{ '--i': 6 }}>
             <dt data-optical="left">시상</dt>
             <dd>
               <ul className="home-awards">
@@ -80,14 +76,19 @@ export default function HomeSection() {
           </div>
         </dl>
 
-        <div className="home-links rise" style={{ '--i': 8 }}>
-          <a href="#sky" className="home-enter" onClick={enter} data-optical="left">
-            {site.enter}
-          </a>
-          <a href="#awards" className="home-enter home-enter-sub" onClick={showAwards}>
-            {site.awardsLink}
-          </a>
-        </div>
+        <dl className="home-info home-contents">
+          <div className="home-info-col rise" style={{ '--i': 7 }}>
+            <dt data-optical="left">Contents</dt>
+            <dd className="home-links">
+              <a href="#sky" className="home-enter" onClick={enter}>
+                {site.enter}
+              </a>
+              <a href="#awards" className="home-enter home-enter-sub" onClick={showAwards}>
+                {site.awardsLink}
+              </a>
+            </dd>
+          </div>
+        </dl>
       </div>
     </div>
   )

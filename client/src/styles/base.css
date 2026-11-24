@@ -163,56 +163,56 @@ p, dd, li { text-wrap: pretty; }
   color: var(--c-textMute);
 }
 .home-info dd {
-  font-family: var(--t-lead-font);
-  font-size: var(--t-lead-size);
-  font-weight: var(--t-lead-weight);
-  line-height: var(--t-lead-leading);
-  letter-spacing: var(--t-lead-tracking);
+  font-family: var(--t-body-font);
+  font-size: var(--t-body-size);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: var(--t-body-tracking);
   font-variant-numeric: tabular-nums;
 }
-.home-about { grid-row: 3; align-self: start; margin-top: var(--s-7); width: auto; max-width: min(100%, 46rem); }
+.home-info { row-gap: var(--s-3); margin-top: var(--s-7); }
+.home-info-col { grid-template-columns: 4.5rem auto; column-gap: var(--s-4); }
+.home-about { grid-row: 3; align-self: start; margin-top: var(--s-6); width: auto; max-width: min(100%, 40rem); }
 .home-theme { text-wrap: balance; }
-.home-awards { display: flex; flex-wrap: wrap; column-gap: var(--s-6); row-gap: var(--s-1); }
-.home-awards li { display: flex; align-items: baseline; column-gap: var(--s-3); }
+.home-awards { display: flex; flex-wrap: wrap; column-gap: var(--s-5); row-gap: var(--s-1); }
+.home-awards li { display: flex; align-items: baseline; column-gap: var(--s-2); }
 .home-award-count { font-variant-numeric: tabular-nums; }
-.home-links {
-  grid-row: 5; justify-self: start; margin-top: var(--s-8);
-  display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--s-7); row-gap: var(--s-3);
-}
+.home-contents { grid-row: 5; margin-top: var(--s-5); }
+.home-contents .home-info-col { align-items: center; }
+.home-links { display: flex; flex-wrap: wrap; column-gap: var(--s-3); row-gap: var(--s-3); }
+/* 두 링크는 떠 있는 판으로 둬서 본문 글자와 구분한다. 손을 올리면 한 단계 더 뜬다 */
 .home-enter {
-  font-family: var(--t-titleEn-font);
-  font-size: var(--t-titleEn-size);
-  font-weight: var(--t-titleEn-weight);
-  line-height: var(--t-titleEn-leading);
-  letter-spacing: var(--t-titleEn-tracking);
-  transition: opacity var(--m-fast) var(--m-ease);
+  position: relative; isolation: isolate; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-5);
+  background: var(--c-nightRaised); border-radius: var(--r-base); box-shadow: var(--e-1);
+  font-family: var(--t-body-font); font-size: var(--t-body-size); font-weight: 600; letter-spacing: 0.01em; line-height: 1;
+  transition: transform var(--m-fast) var(--m-ease);
 }
-.home-enter-sub { color: var(--c-textSub); }
+.home-enter::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: var(--c-nightHigh); box-shadow: var(--e-3); opacity: 0; transition: opacity var(--m-fast) var(--m-ease); pointer-events: none;
+}
+.home-enter:hover::after { opacity: 1; }
+.home-enter:hover { transform: translateY(-1px); }
+.home-enter:active { transform: scale(0.98); }
+.home-enter-sub { color: var(--c-awardText); }
 /* 낮은 화면과 휴대폰에서는 위아래 간격을 줄여 링크까지 한 화면에 담는다 */
 @media (max-height: 820px), (max-width: 479px) {
   .home-subtitle { margin-top: var(--s-5); }
   .home-about { margin-top: var(--s-5); }
-  .home-info { margin-top: var(--s-6); row-gap: var(--s-3); }
-  .home-links { margin-top: var(--s-6); }
+  .home-info { margin-top: var(--s-5); row-gap: var(--s-2); }
+  .home-contents { margin-top: var(--s-4); }
 }
 @media (max-height: 700px) {
   .home-main { padding-top: var(--s-5); padding-bottom: var(--s-5); }
   .home-subtitle { margin-top: var(--s-4); }
   .home-about { margin-top: var(--s-4); }
-  .home-info { margin-top: var(--s-5); row-gap: var(--s-2); }
-  .home-links { margin-top: var(--s-5); }
+  .home-info { margin-top: var(--s-4); }
+  .home-contents { margin-top: var(--s-3); }
 }
-/* 아주 낮은 화면: 시상 줄은 접고(수상 결과는 Awards에서 본다), 글자를 한 단계 줄인다 */
-@media (max-height: 660px) {
-  .home-info:not(.home-about) > .home-info-col:last-child { display: none; }
+/* 아주 낮은 화면: 시상 줄은 접고(수상 결과는 Awards에서 본다) */
+@media (max-height: 640px) {
+  .home-facts > .home-info-col:last-child { display: none; }
 }
-@media (max-height: 600px) {
-  .home-info dd { font-size: 0.9375rem; line-height: 1.4; }
-  .home-subtitle { font-size: 0.9375rem; line-height: 1.4; }
-  .home-enter { font-size: 1.25rem; }
-}
-.home-enter:hover { opacity: 0.78; }
-.home-enter:active { opacity: 0.6; }
 
 /* 하늘 구간 */
 .sky {
@@ -272,12 +272,13 @@ p, dd, li { text-wrap: pretty; }
   0%, 100% { opacity: 0.72; transform: scale(0.86); }
   50% { opacity: 1; transform: scale(1.22); }
 }
-/* 수상작 별은 더 크고 금빛으로 빛난다 */
-.star.is-award { --core: 14px; }
-.star.is-award[data-award='grand'] { --core: 18px; }
+/* 수상작 별은 더 크고 금빛으로 빛난다. 최우수, 우수, 장려 순으로 크기와 빛이 줄어든다 */
+.star.is-award { --core: 14px; --glow-a: 10px; --glow-b: 34px; --glow-c: 12px; }
+.star.is-award[data-award='grand'] { --core: 21px; --glow-a: 14px; --glow-b: 54px; --glow-c: 22px; }
+.star.is-award[data-award='encouragement'] { --core: 11px; --glow-a: 6px; --glow-b: 20px; --glow-c: 7px; }
 .star.is-award .star-core {
   background: var(--c-awardCore);
-  box-shadow: 0 0 10px 4px var(--c-awardGlowNear), 0 0 36px 14px var(--c-awardGlowFar);
+  box-shadow: 0 0 var(--glow-a) 4px var(--c-awardGlowNear), 0 0 var(--glow-b) var(--glow-c) var(--c-awardGlowFar);
 }
 .star.is-award .star-num { color: var(--c-awardText); }
 .sky-veil { position: absolute; inset: 0; pointer-events: none; background: var(--c-dim); opacity: 0; transition: opacity 0.6s var(--m-ease); }
